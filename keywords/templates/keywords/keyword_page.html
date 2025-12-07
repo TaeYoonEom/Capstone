@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'css/keyword.css' %}">
+
+<!-- 1) 페이지 상단 헤더: 키워드 이름 + 경로 표시 -->
+<div class="container-fluid page-header hero-compact"
+     style="
+       position: relative;
+       background: linear-gradient(135deg, rgba(105,0,184,0.85) 0%, rgba(180,150,255,0.75) 100%);
+       color: #fff;
+       overflow: hidden;
+       border-bottom: 1px solid rgba(255,255,255,0.2);
+     ">
+
+  <div style="position:absolute; inset:0; backdrop-filter: blur(8px); background: rgba(255,255,255,0.05);"></div>
+
+  <div class="container position-relative text-center" style="z-index:2;">
+    <!-- 제목 -->
+    <h1 class="display-6 fw-bold mb-3 page-title"
+        style="color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,0.25); letter-spacing:-0.3px;">
+      {{ keyword_name }}
+    </h1>
+
+    <!-- breadcrumb 카드 -->
+    <div class="d-inline-block mt-2 crumb-card"
+         style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+                border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); backdrop-filter: blur(10px);">
+      <ol class="breadcrumb mb-0"
+          style="background: transparent; font-weight:600; letter-spacing:-0.2px; margin:0;">
+        <li class="breadcrumb-item">
+          <a href="{% url 'main' %}" class="crumb-link">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="javascript:history.back()" class="crumb-link">search page</a>
+        </li>
+        <li class="breadcrumb-item active">keyword</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- 2) 전체 페이지 콘텐츠 시작 -->
+<div class="container-fluid py-2 mt-2">
+  <div class="container py-5">
+    <div class="row g-4 mb-5">
+
+      <!-- 3) 왼쪽 메인 콘텐츠: 키워드 정보, 시각화, 논문 목록 -->
+      <div class="col-lg-8 col-xl-9">
+        <div class="row g-4">
+
+          <!-- 4) (추후 이미지 등 활용할 공간) -->
+          <div class="col-lg-6"></div>
+
+          <!-- 5) 키워드명, 정의 출력 -->
+          <div class="col-lg-12 text-start">
+            <h3 class="fw-bold mb-3"
+                style="font-size: 35px; color: #333; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+              {{ keyword_name }}
+            </h3>
+            <hr class="my-3">
+            <p class="mb-3">
+              <span style="font-weight: 900; font-size: 20px;">정의:</span>
+              <span style="font-size: 18px;">{{ keyword_definition }}</span>
+            </p>
+            <hr class="my-3">
+          </div>
+
+          <!-- 6) 좋아요 버튼 및 PDF 저장 버튼 -->
+          <div class="button-group">
+            <!-- 좋아요 버튼 -->
+            <button
+              class="btn-unified btn-like like-keyword {% if user_liked %}active{% endif %}"
+              data-keyword-id="{{ keyword_id }}">
+              <i class="fas fa-heart"></i>
+              좋아요 (<span id="like-count-{{ keyword_id }}">{{ like_count }}</span>)
+            </button>
+
+            <!-- PDF 저장 버튼 -->
+            <button class="btn-unified btn-pdf ms-2" id="pdfDownload">
+              <i class="fas fa-file-pdf"></i> PDF 저장
+            </button>
+          </div>
+
+          <div class="col-lg-12">
+            <nav class="keyword-tabs-nav">
+              <div class="nav nav-tabs keyword-tabs mb-3">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#nav-about">
+                  관련 분야
+                </button>
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-mission">
+                  정량적 분석
+                </button>
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-network">
+                  정성적 분석
+                </button>
+              </div>
+            </nav>
+
+            <!-- 탭 내용 -->
+            <div class="tab-content mb-5">
+
+              <!-- 관련 분야 탭 -->
+              <div class="tab-pane fade show active" id="nav-about">
+                <div class="d-flex flex-column align-items-start px-2">
+                  <h5 class="fw-bold text-dark">
+                    <i class="fas fa-thumbtack text-danger"></i> Relation Part
+                  </h5>
+                  <ul>
+                    {% for category in keyword_categories %}
+                      <li style="font-size: 18px;">{{ category }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 정량적 분석 탭 -->
+              <div class="tab-pane fade" id="nav-mission">
+                <div class="row">
+                  <!-- 연도별 바 차트 -->
+                  <div class="col-lg-6 d-flex flex-column align-items-start px-2 mb-4 mb-lg-0">
+                    <h5 class="fw-bold text-dark">
+                      <i class="fas fa-chart-bar text-primary"></i> 연도별 키워드 출현 빈도
+                    </h5>
+                    <canvas id="yearlyKeywordChart" width="400" height="300"></canvas>
+                  </div>
+
+                  <!-- 연관 키워드 네트워크 -->
+                  <div class="col-lg-6 d-flex flex-column align-items-start px-2">
+                    <h5 class="fw-bold text-dark">
+                      <i class="fas fa-network-wired text-success"></i> 연관 키워드 네트워크
+                    </h5>
+
+                    <!-- D3 네트워크용 SVG 컨테이너 -->
+                    <svg id="kwNetworkChart"></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 정성적 분석 탭 -->
+              <div class="tab-pane fade" id="nav-network" role="tabpanel" aria-labelledby="nav-network-tab">
+                <div class="analysis-shell rounded p-4"
+                    style="border: 1px solid #E5E7EB; background-color: #F9FAFB; border-radius: 12px;">
+
+                  <!-- 버튼 중앙 정렬 -->
+                  <div class="text-center mb-3">
+                    {% if user.is_authenticated %}
+                    <button id="analysisToggle" class="btn px-4 py-2"
+                            style="background-color:#a177db; color:white; font-weight:600; border-radius:8px;">
+                      정성적 분석 보기
+                    </button>
+                    {% else %}
+                    <button id="loginRedirect" class="btn px-4 py-2"
+                            style="background-color:#ee5454; color:white; font-weight:600; border-radius:8px;">
+                      로그인 후 사용 가능
+                    </button>
+                    {% endif %}
+                  </div>
+
+                  <!-- 분석 내용 영역 -->
+                  <div id="analysisContent" style="display:none; padding-top:15px;">
+                    <div id="loadingMessage" style="display:none; text-align:center;">
+                      <p>📊 분석 중입니다. 잠시만 기다려 주세요...</p>
+                    </div>
+
+                    <div id="analysisResult" class="p-3"
+                        style="
+                            border:1px solid #E5E7EB;
+                            background-color:#ffffff;
+                            border-radius:10px;
+                            box-shadow:0 2px 10px rgba(0,0,0,0.03);
+                            overflow:visible;
+                            height:auto;
+                            max-height:none;
+                        ">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div> <!-- row -->
+      </div> <!-- col-lg-8 -->
+
+      <!-- 오른쪽 사이드바 -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="mb-4">
+          <h4 class="fw-bold mb-4" style="color:#333;">📄 키워드 상세정보</h4>
+          <table class="custom-table">
+            <tbody>
+              <tr><th>핵심 연구 분야</th><td>{{ main_part }}</td></tr>
+              <tr><th>주요 연도</th><td>{{ main_year }}년</td></tr>
+              <tr><th>주요 연관 키워드</th><td>{{ main_related_keyword }}</td></tr>
+              <tr><th>좋아요 수</th><td><span id="total-likes">{{ like_count|default:"0" }}</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div> <!-- row 끝 -->
+
+    <!-- 키워드에 연관된 논문 리스트 영역 -->
+    <div class="container mt-5">
+      <h3 class="mb-3 d-flex align-items-center">
+        <i class="fas fa-file-alt"></i> 키워드별 논문 목록
+        <span class="text-muted small ms-2">({{ page_obj.paginator.count }}건)</span>
+        <!-- 내 서재 담기 -->
+        <button class="btn btn-outline-dark ms-auto save-selected-papers">
+          <i class="far fa-bookmark"></i> 내 서재 담기
+        </button>
+      </h3>
+
+      <hr class="my-3">
+
+      {% if page_obj %}
+        <div class="related-list">
+          {% for paper in page_obj %}
+            <div class="paper-card">
+              <!-- 체크박스 -->
+              <div class="check-col">
+                <input
+                  type="checkbox"
+                  class="form-check-input selected-paper"
+                  name="selected_papers"
+                  value="{{ paper.id }}"
+                  data-paper-id="{{ paper.id }}"
+                >
+              </div>
+
+              <!-- 본문 -->
+              <div class="body-col">
+                <!-- 제목 -->
+                <h5 class="paper-title">
+                  {% if paper.id %}
+                    <a href="{% url 'paper_page' paper_id=paper.id %}">
+                      {{ paper.title }}
+                    </a>
+                  {% else %}
+                    {{ paper.title }}
+                  {% endif %}
+                </h5>
+
+                <!-- 저자 -->
+                <div class="meta-line meta-authors">
+                  <span class="meta-label">저자:</span>
+                  {% for author in paper.authors %}
+                    <a href="{% url 'author_page' author_id=author.id %}" class="text-primary">
+                      {{ author.name }}
+                    </a>{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    <span class="text-muted">저자 없음</span>
+                  {% endfor %}
+                </div>
+
+                <!-- 키워드 -->
+                <div class="meta-line meta-keywords">
+                  <span class="meta-label">키워드:</span>
+                  {% for kw in paper.keywords %}
+                    <span class="tag">#{{ kw.name }}</span>
+                  {% empty %}
+                    <span class="text-muted">키워드 없음</span>
+                  {% endfor %}
+                </div>
+
+                <!-- 파트 | 연도 -->
+                <div class="meta-line meta-partyear">
+                  <span class="meta-label">파트:</span>
+                  {% for part in paper.parts %}
+                    {{ part.name }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    <span class="text-muted">파트 없음</span>
+                  {% endfor %}
+                  <span class="sep">|</span>
+                  <span class="meta-label">연도:</span>
+                  <span>{{ paper.year|default:"연도 없음" }}</span>
+                </div>
+
+              </div>
+            </div>
+          {% endfor %}
+
+          <!-- JS 기반 페이지네이션 컨테이너 -->
+          <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+              <div id="paginationControls" class="mt-2"></div>
+            </nav>
+          </div>
+
+        </div>
+      {% else %}
+        <p class="text-muted">등록된 논문이 없습니다.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== JS 영역 ==================== -->
+
+<!-- 공통 라이브러리 로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<!-- 연도별 출현 빈도 / 연관 키워드 JSON (VSCode 에서는 그냥 JSON이라 JS로 인식 X) -->
+<script id="yearly-data" type="application/json">
+  {{ year_counts_json|safe }}
+</script>
+
+<script id="related-keywords-data" type="application/json">
+  {{ related_keywords_json|safe }}
+</script>
+
+<!-- Django 값 → 전역 설정 객체 (여기만 템플릿 문법, 전부 문자열 안에 넣어서 VSCode 경고 방지) -->
+<script>
+  window.keywordConfig = {
+    id: "{{ keyword_id }}",
+    name: "{{ keyword_name|escapejs }}",
+    contentType: "{{ content_type|default:'keyword' }}",
+    objectId: "{{ object_id|default:keyword_id }}",
+    pageTitle: "{{ page_title|default:keyword_name|escapejs }}",
+    csrfToken: "{{ csrf_token }}",
+
+    currentPage: Number("{{ page_obj.number|default:1 }}"),
+    totalPages:  Number("{{ page_obj.paginator.num_pages|default:1 }}"),
+    itemsPerPage: Number("{{ items_per_page|default:10 }}"),
+
+    // 문자열 비교로 처리 → JS 입장에서는 그냥 true/false 리터럴, VSCode가 템플릿으로 오인 X
+    isAuthenticated: "{{ user.is_authenticated|yesno:'true,false' }}" === "true"
+  };
+</script>
+
+<!-- 분리한 JS 파일 로드 -->
+<script src="{% static 'js/keyword.js' %}"></script>
+
+{% endblock %}

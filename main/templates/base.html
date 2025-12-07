@@ -1,0 +1,324 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}ITRT(IT Research Trends){% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <!-- Clean overrides (시각 개선 전용) -->
+    <link href="{% static 'css/itrt-clean.css' %}?v=20251020" rel="stylesheet">
+
+    
+    <!-- <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"> 에러나서 주석처리--> 
+
+    <!-- Font Awesome 6 버전 예시 -->
+    <link
+    rel="stylesheet"
+     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    integrity="sha512-...생략..."
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    />
+
+    <!-- d3.js -->
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <!-- d3-cloud -->
+    <script src="https://raw.githubusercontent.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+
+</head>
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  
+         d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+<style>
+    .custom-btn {
+        white-space: nowrap;  /* 텍스트 줄바꿈 방지 */
+        text-align: center;   /* 텍스트 중앙 정렬 */
+        min-width: 110px;     /* 버튼 최소 너비 설정 */
+        font-size: 1rem;      /* 글자 크기 조정 */
+    }
+</style>
+
+<!-- Navbar Start -->
+<div class="container-fluid fixed-top bg-white">
+    <div class="container px-0">
+        <nav class="navbar navbar-light bg-white navbar-expand-xl d-block">
+            
+            <!-- ITRT, 검색 바, 아이콘을 가로 정렬 -->
+            <div class="d-flex align-items-center justify-content-between w-100 py-2">
+                <!-- 로고 (왼쪽) -->
+                <a href="{% url 'main' %}" class="navbar-brand text-center">
+                    <h1 class="text-primary display-4 fw-bold mb-0">ITRT</h1>
+                    <p class="small fst-italic" style="color: #6900B8;">IT Research Trends</p>
+                </a>
+
+                <!-- 검색바 -->
+                <form action="{% url 'search' %}" method="get" class="search-form d-flex w-100 px-5" id="search-form">
+                    <!-- 드롭다운 -->
+                    <div class="position-relative" style="width: 160px;">
+                        <!-- 선택된 옵션 출력 위치 -->
+                        <div id="selected-option-text" class="position-absolute top-50 start-50 translate-middle text-dark fw-bold"
+                                style="
+                                pointer-events: none; 
+                                z-index: 5; 
+                                font-size: 1.5rem; /* 글씨 크기 증가 */
+                                color: #000000;    /* 글씨 색상 유지 */
+                                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7); /* 가독성 향상 */
+                            ">
+                            {% if filter == 'author' %}저자
+                            {% elif filter == 'affiliation' %}기관
+                            {% elif filter == 'country' %}국가
+                            {% elif filter == 'keyword' %}키워드
+                            {% else %}논문
+                            {% endif %}
+                        </div>
+
+                        <!-- 드롭다운 -->
+                        <select name="filter" id="filter" class="form-select border-2 border-warning py-4 px-4"
+                                style="
+                                    width: 150px;
+                                    border-radius: 20px 0 0 20px;
+                                    font-size: 1.5rem; 
+                                    height: 55px;
+                                    text-shadow: 0 0 0 #000;
+                                ">
+                            <option value="paper" {% if filter == 'paper' %}selected{% endif %}>논문</option>
+                            <option value="author" {% if filter == 'author' %}selected{% endif %}>저자</option>
+                            <option value="affiliation" {% if filter == 'affiliation' %}selected{% endif %}>기관</option>
+                            <option value="country" {% if filter == 'country' %}selected{% endif %}>국가</option>
+                            <option value="keyword" {% if filter == 'keyword' %}selected{% endif %}>키워드</option>
+                        </select>
+                    </div>
+
+                    <!-- 검색어 입력창 -->
+                    <input type="text" name="query" id="search-box" 
+                        placeholder="검색어를 입력하세요" 
+                        value="{{ query }}"
+                        class="form-control border-2 border-warning py-4 px-4"
+                        style="
+                                font-size: 1.2rem; 
+                                height: 55px; 
+                                flex-grow: 1; 
+                                border-radius: 0 20px 20px 0;
+                        ">
+
+                    <!-- 검색 버튼 -->
+                    <button type="submit" 
+                            class="btn border-2 border-warning py-3 px-4 rounded-pill text-white ms-2"
+                            style="background-color:#6900B8; border-color:#6900B8;">
+                        Search
+                    </button>
+                </form>
+
+                
+                <!-- 아이콘 및 로그인/회원가입 버튼 -->
+                <div class="d-flex flex-column align-items-center">
+                    <div class="d-flex">
+                        <a href="/mypage" class="my-auto me-3" onclick="return checkLogin()">
+                            <i class="fas fa-user fa-2x purple-outline-icon"></i>
+                        </a>
+
+                        
+                        <!--<a href="#" class="position-relative">
+                            <i class="fas fa-robot fa-2x text-success"></i>
+                            <span class="position-absolute bg-warning rounded-circle 
+                                    d-flex align-items-center justify-content-center text-dark px-1"
+                                    style="top: -5px; left: 30px; height: 20px; min-width: 20px;">2</span>
+                        </a>-->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 메뉴 항목 (검색 바 아래 가로 정렬) -->
+            <div class="collapse navbar-collapse bg-white justify-content-center" id="navbarCollapse" style="margin-top: -38px;">
+                <ul class="navbar-nav d-flex flex-row justify-content-center w-100" style="padding-top: 4px; padding-bottom: 4px;">
+                    <li class="nav-item"><a href="{% url 'introduction' %}" class="nav-link px-3  {% if request.resolver_match.url_name == 'introduction' %}active{% endif %} ">소개</a></li>
+                    <li class="nav-item"><a href="{% url 'analysis' %}" class="nav-link px-3 {% if request.resolver_match.url_name == 'analysis' %}active{% endif %}">분석</a></li>
+                    <!-- ✅ 새로 추가된 메뉴 -->
+                    <li class="nav-item"><a href="{% url 'popular_papers_page' %}" class="nav-link px-3 {% if request.resolver_match.url_name == 'popular_papers' %}active{% endif %}">인기 자료</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle px-3" data-bs-toggle="dropdown">연구분야별 논문</a>
+                        <ul class="dropdown-menu bg-secondary rounded-0">
+                            {% for part in parts %}
+                            <li>
+                                <a href="{% url 'part_paper_page' %}?part_id={{ part.id }}&part_name={{ part.name|urlencode }}" class="dropdown-item">
+                                    {{ part.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>                                                        
+                </ul>
+                <!-- 로그인/회원가입/로그아웃 버튼 -->
+                <div class="d-flex mt-2">
+                    {% if request.session.user_id %}
+                        <!-- 로그아웃 버튼 -->
+                        <button class="btn btn-danger px-3 custom-btn btn-logout">로그아웃</button>
+                    {% else %}
+                        <!-- 로그인/회원가입 버튼 -->
+                        <a href="/login"
+                            class="btn border-2 px-3 me-2 custom-btn"
+                            style="background-color: #fff; border-color: #6900B8; color: #000;">
+                            로그인
+                        </a>
+                        <a href="/register"
+                            class="btn border-2 px-3 custom-btn"
+                            style="background-color: #6900B8; border-color: #6900B8; color: #fff;">
+                            회원가입
+                        </a>
+                    {% endif %}
+                </div>
+                
+                
+            </div>
+        </nav>
+    </div>
+</div>
+<!-- Navbar End -->
+
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" 
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" 
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <div class="input-group w-75 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="keywords"
+                               aria-describedby="search-icon-1">
+                        <span id="search-icon-1" class="input-group-text p-3">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Search End -->
+
+    {# 메시지 표시를 위한 코드 #}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {# 메인 컨텐츠 블록 #}
+    {% block contents %}
+    {% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterSelect = document.getElementById('filter');
+            const selectedOptionText = document.getElementById('selected-option-text');
+    
+            // 드롭다운 변경 시 선택된 옵션을 UI에 반영
+            filterSelect.addEventListener('change', function () {
+                selectedOptionText.textContent = filterSelect.options[filterSelect.selectedIndex].text;
+            });
+    
+            // 검색 후에도 선택한 필터 유지 (페이지 로드 시 실행)
+            const currentFilter = "{{ filter_type }}";
+            if (currentFilter) {
+                filterSelect.value = currentFilter;
+                selectedOptionText.textContent = filterSelect.options[filterSelect.selectedIndex].text;
+            }
+        });
+    </script>
+    
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>   
+
+    <!-- JavaScript Libraries -->
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- 로그아웃 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const logoutButton = document.querySelector('.btn-logout');
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function () {
+            fetch('/logout/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('로그아웃 성공!');
+                    window.location.href = '/';
+                } else {
+                    alert('로그아웃 실패!');
+                }
+            });
+        });
+    }
+
+    function getCookie(name) {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const [key, value] = cookie.trim().split('=');
+            if (key === name) {
+                return decodeURIComponent(value);
+            }
+        }
+        return null;
+    }
+});
+    </script>
+
+<script>
+    function checkLogin() {
+        const isLoggedIn = "{{ request.session.user_id }}" !== "None";
+        if (!isLoggedIn) {
+            alert("로그인을 하셔야 합니다!");
+            window.location.href = "/login";
+            return false;
+        }
+        return true;
+    }
+</script>
+
+
+</body>
+</html>

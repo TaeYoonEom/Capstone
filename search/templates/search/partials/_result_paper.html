@@ -1,0 +1,88 @@
+{% if results %}
+    {% if filter_type == "paper" %}
+        {% for paper in results %}
+        <div class="mb-4 p-3 border shadow-sm rounded d-flex align-items-start paper-item">
+
+            <div class="me-3">
+                <input type="checkbox"
+                    name="selected_papers"
+                    class="selected-paper"
+                    value="{{ paper.id }}"
+                    data-paper-id="{{ paper.id }}"
+                    class="form-check-input custom-purple-checkbox" 
+                    {% if paper.id in saved_paper_ids %}checked{% endif %}/>
+            </div>
+
+            <div class="flex-grow-1">
+                <!-- 논문 제목 -->
+                <h5 class="mb-2 fw-bold" style="color: black;">
+                    <a href="{% url 'paper_page' paper_id=paper.id %}"
+                    style="text-decoration: none; color: inherit;">
+                        {{ paper.title }}
+                    </a>
+                </h5>
+
+                <!-- 초록 -->
+                <p class="mb-2 text-muted" style="font-size: 0.95rem;">
+                    {{ paper.abstract|default:"초록 없음"|striptags|truncatechars:150 }}
+                </p>
+
+                <!-- 키워드 -->
+                {% if paper.keyword_pairs %}
+                <div class="mb-2" style="font-size: 0.85rem; color: black;">
+                    {% for kw in paper.keyword_pairs %}
+                    <a href="{% url 'keyword_page' kw.id %}">
+                        <span class="badge bg-light me-1" style="color:#6900B8;">#{{ kw.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- 저자 -->
+                {% if paper.author_pairs %}
+                <div class="mb-2" style="font-size: 0.85rem; color: black;">
+                    <strong>저자 </strong>
+                    {% for author in paper.author_pairs|slice:":5" %}
+                    <a href="{% url 'author_page' author.id %}" class="text-decoration-none" style="color:#000;">
+                        {{ author.name }}
+                    </a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if paper.author_pairs|length > 5 %}
+                        외 {{ paper.author_pairs|length|add:"-5" }}인
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- 발행처 -->
+                {% if paper.published_in %}
+                    <div class="mb-2" style="font-size: 0.85rem;color: black;">
+                        <strong>발행처 </strong> {{ paper.published_in }}
+                    </div>
+                {% endif %}
+
+                <!-- 파트, 연도, 인용수 -->
+                <div class="mb-2" style="font-size: 0.85rem; color: black;">
+                    <strong>파트 </strong> {{ paper.part|default:"정보 없음" }} |
+                    <strong>연도 </strong> {{ paper.year }} |
+                    <strong>인용수 </strong> {{ paper.citation|default:"0" }}
+                </div>
+            </div>
+
+            <div class="d-flex flex-column align-items-center ms-auto align-self-center" data-like="container">
+                <button class="btn like-btn"
+                        data-id="{{ paper.id }}"
+                        data-type="paper"
+                        data-like-url="{% url 'like_paper' item_id=paper.id %}"
+                        data-logged-in="{% if user_id %}true{% else %}false{% endif %}"
+                        style="border: none; background: none;">
+                    <i class="fa-{% if paper.liked %}solid{% else %}regular{% endif %} fa-heart text-danger" style="font-size: 24px;"></i>
+                </button>
+                <span class="like-count" data-type="paper" data-id="{{ paper.id }}">{{ paper.like_count }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-danger">검색 결과가 없습니다.</p>
+    {% endif %}
+{% endif %}
+

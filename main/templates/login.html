@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #9f88f1, #5fb2e9);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-login {
+            font-size: 0.9rem;
+            letter-spacing: 0.05rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .btn-google {
+            color: white !important;
+            background-color: #ea4335;
+        }
+
+        .btn-facebook {
+            color: white !important;
+            background-color: #3b5998;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card border-0 shadow rounded-3 my-5">
+                <div class="card-body p-4 p-sm-5">
+                    <!-- ITRT 로고 -->
+                    <div class="text-center mb-4">
+                        <a href="{% url 'main' %}" class="navbar-brand">
+                            <h1 class="display-4 fw-bold" style="color: #6900B8;">ITRT</h1>
+                        </a>
+                    </div>
+                    <form id="loginForm">
+                        
+                        <input type="hidden" id="nextUrl" value="{{ next }}">
+                        <input type="hidden" id="fromRegister" value="{{ from_register }}">
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="user_name" placeholder="Username" required>
+                            <label for="user_name">User ID</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="rememberPasswordCheck">
+                            <label class="form-check-label" for="rememberPasswordCheck">
+                                Remember password
+                            </label>
+                        </div>
+
+                        <div class="d-grid mb-2">
+                            <button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">로그인</button>
+                        </div>
+                        <!-- ID/PW 찾기 버튼 -->
+                        <div class="text-center mt-3">
+                            <a href="#" id="forgotPasswordBtn" class="text-decoration-none text-primary fw-bold">ID/PW 찾기</a>
+                            <span class="mx-2">|</span>
+                            <a href="{% url 'register_page' %}" class="text-decoration-none text-primary fw-bold">회원가입</a>
+                        </div>
+                        <!-- ID/PW 찾기 모달 -->
+                        <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="forgotPasswordModalLabel">ID / 비밀번호 찾기</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="forgotPasswordForm">
+                                            <!-- ID 찾기 -->
+                                            <div class="mb-3">
+                                                <label for="findUserEmail" class="form-label">이메일을 입력하세요 (ID 찾기)</label>
+                                                <input type="email" class="form-control" id="findUserEmail" placeholder="example@example.com">
+                                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="findUserIdBtn">ID 찾기</button>
+                                                <p id="userIdResult" class="text-success mt-1"></p>
+                                            </div>
+                    
+                                            <hr>
+
+                                            <!-- 비밀번호 찾기 -->
+                                            <div class="mb-3">
+                                                <label for="findUserId" class="form-label">ID 입력 (비밀번호 찾기)</label>
+                                                <input type="text" class="form-control" id="findUserId" placeholder="User ID">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="findUserEmailPw" class="form-label">이메일 입력 (비밀번호 찾기)</label>
+                                                <input type="email" class="form-control" id="findUserEmailPw" placeholder="example@example.com">
+                                            </div>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" id="resetPasswordBtn">비밀번호 재설정</button>
+                                            <p id="passwordResetResult" class="text-danger mt-1"></p>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const user_name = document.getElementById('user_name').value;
+        const password = document.getElementById('password').value;
+
+        // CSRF 토큰 가져오기
+        const csrfToken = getCookie('csrftoken');
+
+        try {
+            const response = await fetch('/login_user/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ user_name, password })
+            });
+
+            const result = await response.json();
+
+            if (response.status === 200) {
+                alert('로그인 성공! 메인 페이지로 이동합니다.');
+                window.location.href = 'http://calfadventure.com:8000/';
+            } else {
+                alert(`로그인 실패: ${result.error}`);
+            }
+        } catch (error) {
+            alert(`로그인 요청 실패: ${error.message}`);
+        }
+    });
+
+    // CSRF 토큰 가져오는 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script> -->
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const user_name = document.getElementById('user_name').value;
+    const password = document.getElementById('password').value;
+    const nextUrl = document.getElementById('nextUrl').value || "";
+    const fromRegister = document.getElementById('fromRegister').value || "0";
+
+    const csrfToken = getCookie('csrftoken');
+
+    try {
+        const response = await fetch('/login_user/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ 
+                user_name, 
+                password, 
+                next: nextUrl,         // ✅ 추가
+                from_register: fromRegister 
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.status === 200) {
+            alert('로그인 성공!');
+            window.location.href = result.redirect_url; // ✅ 리다이렉트 URL
+        } else {
+            alert(`로그인 실패: ${result.error}`);
+        }
+    } catch (error) {
+        alert(`로그인 요청 실패: ${error.message}`);
+    }
+});
+
+
+    // CSRF 토큰 가져오는 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+
+<script>
+    document.getElementById('forgotPasswordBtn').addEventListener('click', function () {
+        var myModal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+        myModal.show();
+    });
+
+    // ID 찾기 요청
+    document.getElementById('findUserIdBtn').addEventListener('click', async function () {
+        const email = document.getElementById('findUserEmail').value;
+        if (!email) {
+            alert("이메일을 입력하세요.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/find_user_id/?email=${encodeURIComponent(email)}`);
+            const result = await response.json();
+
+            if (response.status === 200) {
+                document.getElementById('userIdResult').innerText = `회원님의 ID: ${result.user_name}`;
+            } else {
+                document.getElementById('userIdResult').innerText = result.error;
+            }
+        } catch (error) {
+            alert("ID 찾기 요청 실패");
+        }
+    });
+
+    // 비밀번호 재설정 요청
+    document.getElementById('resetPasswordBtn').addEventListener('click', async function () {
+        const userId = document.getElementById('findUserId').value;
+        const email = document.getElementById('findUserEmailPw').value;
+
+        if (!userId || !email) {
+            alert("ID와 이메일을 입력하세요.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/reset_password/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_name: userId, email: email })
+            });
+
+            const result = await response.json();
+
+            if (response.status === 200) {
+                document.getElementById('passwordResetResult').innerText = "임시 비밀번호가 이메일로 전송되었습니다.";
+            } else {
+                document.getElementById('passwordResetResult').innerText = result.error;
+            }
+        } catch (error) {
+            alert("비밀번호 재설정 요청 실패");
+        }
+    });
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

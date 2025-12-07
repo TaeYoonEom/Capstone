@@ -1,0 +1,114 @@
+/* ===========================
+   Part Paper (주제별 논문)
+   =========================== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
+
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', Arial, sans-serif !important;
+}
+/* 타이틀 & 링크 */
+.list-title { font-size:25px; font-weight:bold; color:#000000; }
+.text-link { font-size:16px; font-weight:bold; color:#1d1d1d; text-decoration:none; }
+.text-link:hover { text-decoration:underline; color:#8E24AA; }
+
+/* 테이블 헤더 */
+.table-header { background-color:#EDE7F6; color:#6900B8; font-weight:bold; }
+
+/* 레이아웃 컨테이너 (왼쪽 정렬 + 드롭다운 보임 보정) */
+.left-align-container{
+  margin-top:20px;
+  margin-left:90px;
+  max-width:1100px;
+  text-align:left;
+  position:relative;     /* dropdown 위치 기준 */
+  overflow:visible;      /* dropdown이 가려지지 않도록 */
+  z-index:1;
+}
+
+/* 페이지네이션 */
+.pagination{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-left:-50px;
+  justify-content:center;
+}
+.page-btn{
+  border:1px solid #D1C4E9;
+  padding:6px 10px;
+  border-radius:8px;
+  background:#fff;
+  cursor:pointer;
+}
+.page-btn.active{ background:#6900B8; color:#fff; border-color:#6900B8; }
+.page-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* 검색어 하이라이트: 배경 없이 텍스트만 강조 */
+.hl{ color:#FFA500; font-weight:bold; background:transparent; }
+
+/* ===========================
+   Dropdown 보정 (가려짐/위치)
+   =========================== */
+.dropdown{ position:relative; }
+.dropdown-menu{
+  /* 다른 요소 위에 올라오게 */
+  z-index:1055;
+  /* 위치 꼬임 방지 (특히 스크롤 컨테이너 안에서) */
+  inset:auto !important;
+  transform:translate3d(0,0,0) !important;
+
+  min-width:240px;
+  max-height:280px;
+  overflow-y:auto;
+  /* 가독성 */
+  border-radius:10px;
+}
+
+/* 드롭다운 항목: 항상 검정 텍스트 */
+.dropdown-menu .dropdown-item{
+  color:#000000 !important;
+  font-weight:600;
+}
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu .dropdown-item.active{
+  color:#000000 !important;
+  background-color:#F4ECFF; /* 은은한 연보라 hover */
+}
+
+/* 드롭다운 버튼 글씨/화살표를 #000로 강제 */
+#partDropdown{
+  color:#000000 !important;
+  font-weight:700; /* 원하면 제거 가능 */
+  background-color:#f6f2fd;
+}
+#partDropdown:hover,
+#partDropdown:focus,
+#partDropdown:active{
+  color:#000000 !important;
+}
+
+/* caret(▾) 색상도 검정으로 */
+#partDropdown.dropdown-toggle::after{
+  border-top-color:#000000 !important;     /* 기본 상태 */
+}
+#partDropdown.show.dropdown-toggle::after{
+  border-top-color:#000000 !important;     /* 펼쳐졌을 때도 */
+}
+
+/* (Bootstrap 5 변수 기반 버튼일 때 안전빵 오버라이드) */
+#partDropdown.btn-light{
+  --bs-btn-color:#000;
+  --bs-btn-hover-color:#000;
+  --bs-btn-active-color:#000;
+}
+
+/* ▶ 파트 선택 버튼 살짝 왼쪽으로 */
+#partDropdown{
+  margin-left:-13px;   /* -8~-12px 사이로 조절 가능 */
+}
+
+/* ▶ 전체 섹션을 살짝 아래로 */
+.left-align-container{
+  margin-top: 44px;    /* 기존 20px → 44px (약 +24px) */
+}

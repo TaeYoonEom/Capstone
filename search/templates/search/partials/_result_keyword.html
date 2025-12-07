@@ -1,0 +1,37 @@
+{% if results %}
+    {% if filter_type == "keyword" %}    
+        {% for kw in results %}
+            <div class="mb-4 p-3 border shadow-sm rounded d-flex align-items-start"
+                data-year="{{ kw.main_year|default:'정보 없음'}}"
+                data-part="{{ kw.main_part|default:'정보 없음' }}">
+                <div class="flex-grow-1">
+                    <h5 class="mb-2 fw-bold">
+                        <a href="{% url 'keyword_page' kw.id %}" class="text-decoration-none text-dark keyword-link" data-id="{{ kw.id }}">
+                            {{ kw.keyword_name }}
+                        </a>
+                    </h5>
+                    <!-- 오른쪽: 파트 / 논문수 / 연도 -->
+                    <div class="text-muted" style="font-size: 0.9rem;">
+                        <span><strong>파트 </strong> {{ kw.main_part|default:"정보 없음" }}</span> |
+                        <span><strong>논문수 </strong> {{ kw.paper_count|default:0 }}</span> |
+                        <span><strong>연도 </strong> {{ kw.main_year|default:"정보 없음" }}</span>
+                    </div>
+                </div>
+                <!-- 하트 버튼 -->
+                <div class="d-flex flex-column align-items-center ms-auto align-self-center" data-like="container">
+                    <button class="btn like-btn"
+                        data-id="{{ kw.id }}"
+                        data-type="keyword"
+                        data-like-url="{% url 'like_keyword' item_id=kw.id %}"
+                        data-logged-in="{% if user_id %}true{% else %}false{% endif %}" 
+                        style="border: none; background: none;">
+                        <i class="fa-{% if kw.liked %}solid{% else %}regular{% endif %} fa-heart text-danger" style="font-size: 24px;"></i>
+                    </button>
+                    <span class="like-count"data-id="{{ kw.id }}" data-type="keyword">{{ kw.like_count }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-danger">검색 결과가 없습니다.</p>
+    {% endif %}
+{% endif %}

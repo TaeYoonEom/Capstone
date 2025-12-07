@@ -1,0 +1,446 @@
+/* =============== 공통 레이아웃/타이포 =============== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
+
+:root{
+  --itrt-purple:#6900B8;
+  --text-black:#000000;
+  --text-gray:#555555;       /* 본문/메타 기본 */
+  --text-gray-strong:#333333;/* 라벨/강조 */
+}
+
+/* 페이지 기본 폰트 */
+body, .container, .list-group, .card, .section-title, button, input, select, label {
+  font-family: 'Noto Sans KR','Roboto',sans-serif !important;
+  color:#222;
+  letter-spacing:-0.2px;
+}
+
+/* 제목(예: 섹션 타이틀/사이드바 타이틀)은 살짝 두껍게 */
+.section-title h3, .list-group-item.bg-primary, .list-group-item.bg-secondary {
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+/* =============== 카드/리스트 기본 =============== */
+.col-md-10 .card {
+  border: none !important;
+  box-shadow: none !important;
+  background: #fff !important;
+}
+
+.list-group-item {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* 섹션 제목 h3(스크립트로 mb-0가 들어감) */
+h3.mb-0 { margin-bottom: 5px !important; }
+
+/* 카드 바디 패딩 살짝 축소 */
+.card-body { padding-top: 8px !important; padding-bottom: 8px !important; }
+
+/* =============== 저장 논문/최근 논문 리스트 =============== */
+#saved-papers-list .list-group-item {
+  display: flex;
+  flex-direction: column;   /* 버튼 자동 줄바꿈 */
+  align-items: flex-start;  /* 좌측 정렬 */
+  gap: 10px;
+}
+
+.recent-paper-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+.recent-paper-text { flex-grow: 1; white-space: normal; word-break: break-word; }
+.recent-paper-button { width: 80px; text-align: center; flex-shrink: 0; }
+
+/* ==========================
+   📑 논문 네모 박스(공통 스타일)
+   ========================== */
+/* 카드(네모박스) 공통 */
+.paper-item{
+  position: relative;                 /* 하단 버튼 고정 기준 */
+  background:#fff;
+  border:1px solid #e0e0e0 !important;
+  border-radius:12px !important;
+  padding:16px 20px 50px !important;  /* ⬅︎ 하단 여백 크게(버튼 높이 + 여유) */
+  margin-bottom:-5px !important;      /* 카드 간 간격 조금 */
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  transition: all .25s ease-in-out;
+  display:flex;
+  flex-direction:column;
+  gap:10px;                           /* 본문과 버튼 사이 살짝 띄움 */
+}
+
+.paper-item:hover {
+  border-color: #6900B8 !important;
+  box-shadow: 0 4px 12px rgba(105, 0, 184, 0.25);
+  transform: translateY(-2px);
+}
+
+/* 좌하단 좋아요 고정 */
+.paper-like-fixed{
+  position:absolute;
+  left:16px;
+  bottom:16px;
+}
+
+/* 우하단 상세보기/삭제 고정 */
+.paper-actions-fixed{
+  position:absolute;
+  right:16px;
+  bottom:16px;
+}
+
+/* 혹시 본문 마지막 단락이 너무 붙으면 살짝 띄우기(안전망) */
+.paper-item p:last-of-type{ margin-bottom:12px; }
+
+/* 버튼 크기 살짝 조정 */
+.paper-actions-fixed .btn,
+.paper-like-fixed .btn {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+/* 제목 */
+.paper-item h5 {
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 6px;
+}
+
+/* 초록 (기존 코드 유지) */
+.abstract-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 3.2em; /* 1.6em * 2줄 */
+  line-height: 1.6em;
+  word-wrap: break-word;
+  color: #444;
+}
+
+/* 메타 정보 */
+.paper-item .meta {
+  font-size: 0.9em;
+  color: #777;
+}
+
+/* 버튼 영역 */
+.paper-item .paper-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+
+/* 버튼 묶음: 좋아요(왼쪽) / 상세&삭제(오른쪽) */
+.paper-actions-container{
+  display:flex; justify-content:space-between; align-items:center; width:100%;
+}
+.like-button-container{ display:flex; justify-content:flex-start; }
+.paper-actions{ display:flex; justify-content:flex-end; gap:8px; }
+
+/* 저장 논문 버튼 줄바꿈 방지 */
+#saved-papers-list .btn { white-space: nowrap; }
+
+/* =============== 페이지네이션 =============== */
+/* ===== Purple pagination theme (공통) ===== */
+
+/* 컨테이너 정렬은 유지 */
+.pagination {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: -50px;
+  justify-content: center;
+  overflow: visible; /* 잘림 방지 */
+  margin-top: 35px;
+}
+
+/* 공통 버튼 베이스: 커스텀(.page-btn) + 부트스트랩(.page-link) 둘 다 */
+.pagination .page-link,
+.page-btn {
+  background: #fff;
+  color: #1d1d1d;                 /* 기본 글자색은 검정에 가깝게 */
+  border: 1.5px solid #E6E0F7;    /* 연보라 테두리 (스크린샷 톤) */
+  border-radius: 12px;            /* 둥근 사각형 */
+  padding: 6px 10px;              /* ← 크기 유지 */
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .15s ease-in-out;
+  display: inline-flex; 
+  align-items: center; 
+  white-space: nowrap;
+  box-shadow: 0 0 0 0 rgba(105,0,184,0); /* focus 트랜지션용 */
+}
+
+/* Hover – 아주 연한 보라 배경 */
+.pagination .page-link:hover,
+.page-btn:hover {
+  background-color: #F6F1FF;      /* 연한 보라 */
+  border-color: #D6C7FF;          /* 살짝 진한 연보라 테두리 */
+  color: #1d1d1d;
+}
+
+/* Active (현재 페이지) – 보라 꽉 채움 */
+.pagination .page-item.active .page-link,
+.page-btn.active {
+  background-color: #6900B8;      /* 진보라 */
+  border-color: #6900B8;
+  color: #fff !important;
+}
+
+/* Focus 접근성 링 – 은은한 보라 */
+.pagination .page-link:focus,
+.page-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(105, 0, 184, .15);
+}
+
+/* Disabled – 흐릿한 회색(클릭 불가) */
+.pagination .page-link[disabled],
+.page-btn:disabled,
+.pagination .page-item.disabled .page-link {
+  opacity: 1;                      /* 명도 직접 지정하므로 1로 */
+  background: #F3F3F7;
+  color: #C5C1D6;
+  border-color: #EEEAF9;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 사이즈 옵션(원래 값 유지) */
+.page-btn.sm,
+.pagination .page-link.sm {
+  padding: 4px 8px;
+  font-size: 0.9rem;
+}
+.page-btn.lg,
+.pagination .page-link.lg {
+  padding: 8px 14px;
+  font-size: 1.05rem;
+}
+
+/* 좋아요 논문 페이지네이션 전용 여백/구분선 */
+#liked-papers-pagination {
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+
+/* =============== 섹션 제목 + 밑줄 그라데이션 =============== */
+.section-title{ position:relative; background:#fff; padding:10px 0 0; }
+
+.section-title h3{
+  margin:0;
+  font-weight:700;
+  color:#111;
+  position:relative;
+  z-index:2;
+  padding-left:25px;
+}
+
+/* 카드별 컬러 변수 기본값 */
+.col-md-10 .card{
+  --accent: 155, 89, 182;               /* RGB 기본값(보라) */
+  --accent-strong: rgb(var(--accent));  /* 시작 강색 */
+  --underline-offset: 25px;             /* 제목 padding-left와 동일 */
+}
+
+/* 섹션별 색상 지정 */
+.col-md-10 .card[data-section="liked"]       { --accent: 231, 76, 60; }   /* ❤️ 빨강 */
+.col-md-10 .card[data-section="recommended"] { --accent: 241,196, 15; }   /* 💡 노랑 */
+.col-md-10 .card[data-section="pdfs"]        { --accent: 149,165,166; }   /* 📄 회색 */
+.col-md-10 .card[data-section="recent"]      { --accent: 26,188,156; }    /* 🕒 민트 */
+
+/* 기본(저장된 논문 등)만 시작색을 #6900B8로 고정 */
+.col-md-10 .card[data-section="default"]{
+  --accent: 155, 89, 182;
+  --accent-strong: #6900B8;
+}
+
+/* 밑줄: 왼쪽 진하게 → 오른쪽 투명 페이드 */
+.section-title::after{
+  content:"";
+  position:absolute;
+  left:var(--underline-offset);
+  right:0;
+  bottom:0;
+  height:4px;
+  border-radius:2px;
+  background:linear-gradient(
+    90deg,
+    var(--accent-strong) 0%,
+    rgba(var(--accent), 0.90) 10%,
+    rgba(var(--accent), 0.75) 25%,
+    rgba(var(--accent), 0.60) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* ==========================
+   💜 마이페이지 / 필터 제목 바
+   ========================== */
+
+/* 사이드바 타이틀(‘마이페이지’)만 보라색 */
+#sidebar .list-group > .list-group-item.bg-primary{
+  background-color: var(--itrt-purple) !important;
+  border-color: var(--itrt-purple) !important;
+  color:#fff !important;
+  border-radius:12px !important;
+  box-shadow:0 4px 10px rgba(105,0,184,0.18);
+}
+
+/* 필터 타이틀(‘🔍 필터’)만 보라색 */
+#filter-section > .list-group-item.bg-secondary{
+  background-color: var(--itrt-purple) !important;
+  border-color: var(--itrt-purple) !important;
+  color:#fff !important;
+  border-radius:12px !important;
+  box-shadow:0 4px 10px rgba(105,0,184,0.18);
+  margin-bottom: 10px;
+}
+
+/* 좋아요 드롭다운 버튼은 흰색 유지 */
+#liked-items-dropdown{
+  background:#fff !important;
+  color:#212529 !important;
+  border:1px solid #e9ecef !important;
+  border-radius:12px !important;
+  box-shadow:none !important;
+}
+#liked-items-dropdown:hover{ background:#f8f9fa !important; }
+
+/* 필터 내부 항목(연도/연구 분야 등)은 흰 배경 유지 */
+#filter-section .list-group .list-group-item{
+  background:#fff !important;
+  color:#333 !important;
+  border-color:#eee !important;
+}
+/* 혹시 첫 항목에 보라 배경이 들어가는 전역 규칙 무력화 */
+#filter-section .list-group .list-group-item:first-child{
+  background:#fff !important;
+  color:#333 !important;
+}
+
+/* 사이드바 일반 항목은 흰 배경 유지 + 호버 시 보라 글자 */
+#sidebar .list-group-item:not(.bg-primary){
+  background:#fff !important;
+  color:#333 !important;
+}
+#sidebar .list-group-item.list-group-item-action:hover{
+  color: var(--itrt-purple);
+}
+
+/* ==========================
+   🎯 타이포 컬러 규칙(요구사항)
+   ========================== */
+/* 논문 제목 = 검정(#000) */
+.col-md-10 h5,
+#liked-papers-list h5,
+#recommended-papers-list h5{
+  color: var(--text-black) !important;
+  font-weight:700;
+}
+
+/* 메타 정보(초록/키워드/저자/파트/발행처/저장일) = 회색(#555) */
+.col-md-10 .text-muted,
+.col-md-10 p{
+  color: var(--text-gray) !important;
+}
+
+/* 메타 라벨(예: ‘초록:’, ‘키워드:’ 등) = 더 짙은 회색(#333) */
+.col-md-10 p strong{
+  color: var(--text-gray-strong) !important;
+  font-weight:600;
+}
+
+/* 최근 본 논문 작은 날짜 텍스트도 회색 */
+.recent-paper-text small{ color: var(--text-gray) !important; }
+
+/* 링크/버튼 호버 컬러만 보라 (선택 사항) */
+a:hover, .btn-link:hover{ color: var(--itrt-purple); }
+
+/* ==========================
+   💜 상세보기 버튼 스타일 (저장 논문, 좋아요 논문 등 공통)
+   ========================== */
+
+.btn-detail, 
+button.detail-btn, 
+#saved-papers-list .btn-outline-primary, 
+#liked-papers-list .btn-outline-primary, 
+#recommended-papers-list .btn-outline-primary {
+  background-color: #fff !important;
+  border: 2px solid #6900B8 !important;
+  color: #000 !important;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 4px 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover 시 은은한 보라 배경 효과 */
+.btn-detail:hover, 
+button.detail-btn:hover, 
+#saved-papers-list .btn-outline-primary:hover, 
+#liked-papers-list .btn-outline-primary:hover, 
+#recommended-papers-list .btn-outline-primary:hover {
+  background-color: #c18cfd !important;
+  color: #000 !important;
+  border-color: #6900B8 !important;
+  box-shadow: 0 0 6px rgba(105, 0, 184, 0.2);
+}
+
+/* 보라색 테두리 버튼 (공통) */
+.btn-outline-itrt {
+  border: 1.5px solid #6900B8 !important;
+  color: #111 !important;
+  font-weight: 500;
+  background-color: #fff !important;
+  transition: all 0.25s ease;
+}
+.btn-outline-itrt:hover {
+  background-color: rgba(105, 0, 184, 0.15) !important; /* 은은한 보라 hover */
+  color: #111 !important;
+}
+
+/* 좋아요 왼쪽 사이드바 스타일 수정
+
+/* 좋아요 드롭다운 버튼을 다른 항목과 동일한 네모칸 스타일로 맞춤 */
+#liked-items-dropdown {
+  background-color: #fff !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0 !important;
+  padding: 10px 15px !important;
+  color: #212529 !important;
+  width: 100%;
+  text-align: left;
+}
+
+/* hover 시에도 다른 list-group-item과 동일한 효과 */
+#liked-items-dropdown:hover {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+}
+
+/* 활성화 시에도 깔끔하게 유지 */
+#liked-items-dropdown:focus,
+#liked-items-dropdown:active {
+  box-shadow: none !important;
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+}
+
+/* ▼ 아이콘과 텍스트 간격 */
+#liked-items-dropdown i {
+  margin-right: 5px;
+}

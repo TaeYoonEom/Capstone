@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'css/popular.css' %}?v=1">
+
+<div class="container" style="margin-top:160px">
+  <!-- ✅ 제목 색상을 #000000으로 변경 & text-primary 제거 -->
+  <h3 class="border-bottom pb-2" style="font-size:25px; color:#000000; margin-top:190px;">
+    인기 자료 (Top 10)
+  </h3>
+
+  <!-- Top 10 표 -->
+  <table class="table table-bordered">
+    <thead class="table-header">
+      <tr>
+        <th style="width:80%; text-align:left; font-size:20px; font-weight:bold; padding:7px;">제목</th>
+        <th style="width:20%; text-align:center; font-size:20px; font-weight:bold; padding:7px;">저장 횟수</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for paper in popular_papers %}
+      <tr>
+        <td style="font-size:15px; font-weight:bold; padding:5px;">
+          <a href="{% url 'paper_page' paper.id %}" class="text-link">
+            {{ forloop.counter }}. {{ paper.title }}
+          </a>
+        </td>
+        <td style="text-align:center; font-size:15px; font-weight:bold; padding:5px; color:#1d1d1d;">
+          {{ paper.save_count }}회
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2" class="text-muted text-center">표시할 자료가 없습니다.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ✅ 뉴스 전용 섹션 (표 아래 독립 리스트) -->
+  <div class="news-section">
+    <!-- ✅ 제목 색상을 #000000으로 변경 -->
+    <h4 class="border-bottom pb-2" style="font-size:22px; color:#000000;">
+      관련 뉴스 리스트 <span class="badge">Top10 기반</span>
+    </h4>
+
+    <!-- ✅ AJAX 로딩 영역 -->
+    <div id="news-feed">
+      <div class="text-muted">뉴스 검색중…</div>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const box = document.getElementById('news-feed');
+    const apiBase = "{% url 'popular_news_feed_api' %}";
+
+    async function load(url) {
+      const res = await fetch(url, { headers: { "Accept": "application/json" }});
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }
+
+    try {
+      // 1차 로드
+      let data = await load(apiBase);
+      // 빈 응답이면 캐시 리프레시 후 1회 재시도
+      if (!Array.isArray(data) || data.length === 0) {
+        data = await load(apiBase + "?refresh=1");
+      }
+
+      if (!Array.isArray(data) || data.length === 0) {
+        box.innerHTML = '<div class="text-muted">관련 뉴스가 없습니다. (최근 캐시 기준)</div>';
+        return;
+      }
+
+      const ul = document.createElement('ul');
+      ul.style.listStyle = 'none';
+      ul.style.paddingLeft = '0';
+      ul.style.marginTop = '10px';
+
+      data.forEach(n => {
+        const li = document.createElement('li');
+        li.style.marginBottom = '10px';
+
+        const paperHref = "{% url 'paper_page' 0 %}".replace('0', n.paper_id || '0');
+
+        const matchLabel =
+          (n.match_mode === 'strict' && Array.isArray(n.matched) && n.matched.length)
+            ? `&nbsp;|&nbsp;<span class="meta">매칭: ${n.matched.slice(0,3).join(', ')}</span>`
+            : `&nbsp;|&nbsp;<span class="meta">매칭: 느슨(섹션/국내)</span>`;
+
+        li.innerHTML = `
+          <a href="${n.link}" target="_blank" rel="noopener" class="text-link" style="font-weight:600;">
+            ${n.title}
+          </a>
+          <div class="meta">
+            ${(n.source || '')} · ${(n.pubDate || '')}
+            &nbsp;|&nbsp; 매칭 논문:
+            <a class="meta" href="${paperHref}">${n.paper_title}</a>
+            &nbsp;|&nbsp; 제공: ${(n.provider || '').toUpperCase()}
+            ${matchLabel}
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+
+      box.innerHTML = '';
+      box.appendChild(ul);
+    } catch (e) {
+      console.error(e);
+      box.innerHTML = '<div class="text-muted">뉴스 로딩 실패 (네트워크/쿼터)</div>';
+    }
+  });
+  </script>
+{% endblock %}

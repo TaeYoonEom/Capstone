@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Bard AI Chatbot</title>
+    <script>
+        async function sendMessage() {
+            let userInput = document.getElementById("userInput").value;
+            document.getElementById("userInput").value = "";  // 입력창 초기화
+
+            let response = await fetch("/chat/api/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },  
+                body: JSON.stringify({ message: userInput })      
+            });
+
+            let result = await response.json();
+            let chatbox = document.getElementById("chatbox");
+            
+            if (result.error) {
+                chatbox.innerHTML += "<p style='color:red;'>Error: " + result.error + "</p>";
+            } else {
+                chatbox.innerHTML += "<p><strong>User:</strong> " + userInput + "</p>";
+                chatbox.innerHTML += "<p><strong>AI:</strong> " + result.response + "</p>";
+            }
+            chatbox.scrollTop = chatbox.scrollHeight;  // 자동 스크롤
+        }
+    </script>
+</head>
+<body>
+    <h1>Google Bard AI Chatbot</h1>
+    <div id="chatbox" style="width: 400px; height: 300px; overflow-y: scroll; border: 1px solid black; padding: 10px;"></div>
+    <input type="text" id="userInput" placeholder="메시지를 입력하세요" onkeydown="if(event.key === 'Enter') sendMessage();">
+    <button onclick="sendMessage()">보내기</button>
+</body>
+</html>

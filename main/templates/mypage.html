@@ -1,0 +1,2000 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}?v=1">
+
+
+<!-- ✅ 네비게이션 바 끝 -->
+<div class="container mt-5">
+    <!-- 메시지 출력 -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger text-center" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+<!-- 🖥️ 마이페이지 본문 -->
+<div class="container-fluid" style="margin-top: 200px;">
+  <div class="row">
+    <!-- 🛠️ 왼쪽 사이드바 -->
+    <div class="col-md-2" id="sidebar">
+      <div class="list-group">
+        <div class="list-group-item bg-primary text-white text-center fw-bold">마이페이지</div>
+        <a href="#" class="list-group-item list-group-item-action" id="show-user-info">
+          <i class="fas fa-user"></i> 내 정보
+        </a>
+        <a href="#" class="list-group-item list-group-item-action" id="show-saved-papers">
+          <i class="fas fa-bookmark"></i> 저장 논문
+        </a>
+
+        <!-- 좋아요 통합 버튼 -->
+        <div class="dropdown">
+          <button class="list-group-item list-group-item-action dropdown-toggle w-100 text-start"
+                  id="liked-items-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-heart"></i> 좋아요 <i class="fas fa-chevron-down"></i>
+          </button>
+          <ul class="dropdown-menu w-100" aria-labelledby="liked-items-dropdown" id="liked-items-menu">
+            <li><a class="dropdown-item liked-item-option" data-type="papers">❤️ 논문</a></li>
+            <li><a class="dropdown-item liked-item-option" data-type="authors">❤️ 저자</a></li>
+            <li><a class="dropdown-item liked-item-option" data-type="affiliations">❤️ 기관</a></li>
+            <li><a class="dropdown-item liked-item-option" data-type="countries">❤️ 나라</a></li>
+            <li><a class="dropdown-item liked-item-option" data-type="keywords">❤️ 키워드</a></li>
+          </ul>
+        </div>
+
+        <!-- 좋아요한 데이터 표시 영역 -->
+        <div id="liked-items-container"></div>
+
+        <a href="#" class="list-group-item list-group-item-action" id="show-recommended-papers">
+          <i class="fas fa-lightbulb"></i> 추천 논문
+        </a>
+        <a href="#" class="list-group-item list-group-item-action" id="show-recent-papers">
+          <i class="fas fa-clock"></i> 최근 본 논문
+        </a>
+        <a href="#" class="list-group-item list-group-item-action" id="show-saved-pdfs">
+          <i class="fas fa-file-pdf"></i> 저장된 PDF
+        </a>
+        <!-- <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-chart-bar"></i> 분석 저장</a> -->
+        <!-- <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-robot"></i> AI 채팅</a> -->
+        <br>
+
+        <!-- 🔍 필터 -->
+        <div id="filter-sidebar">
+          <div id="filter-section">
+            <div class="list-group-item bg-secondary text-white text-center fw-bold">🔍 필터</div>
+
+            <!-- ✅ 저장된 논문 필터 그룹 -->
+            <div id="saved-filter-group">
+              <!-- 연도 -->
+              <div class="list-group">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>연도</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="year-filter-container">🔽</button>
+                </div>
+                <div id="year-filter-container" style="display: none;">
+                  {% for year in years %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox year-filter me-2" value="{{ year }}">
+                    {{ year }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 연구 분야 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>연구 분야</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="part-filter-container">🔽</button>
+                </div>
+                <div id="part-filter-container" style="display: none;">
+                  {% for part in research_parts %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox part-filter me-2" value="{{ part }}">
+                    {{ part }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 저자 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>저자</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="author-filter-container">🔽</button>
+                </div>
+                <div id="author-filter-container" style="display: none;">
+                  {% for author in authors_list %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox author-filter me-2" value="{{ author }}">
+                    {{ author }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 발행처 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>발행처</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="publisher-filter-container">🔽</button>
+                </div>
+                <div id="publisher-filter-container" style="display: none;">
+                  {% for publisher in published_in_list %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox publisher-filter me-2" value="{{ publisher }}">
+                    {{ publisher }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ 좋아요한 논문 필터 그룹 -->
+            <div id="liked-paper-filter-group" style="display: none;">
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>연도</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-paper-year-container">🔽</button>
+                </div>
+                <div id="liked-paper-year-container" style="display: none;">
+                  {% for year in liked_paper_years %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-paper-year-filter me-2" value="{{ year }}">
+                    {{ year }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>연구 분야</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-paper-part-container">🔽</button>
+                </div>
+                <div id="liked-paper-part-container" style="display: none;">
+                  {% for part in liked_paper_parts %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-paper-part-filter me-2" value="{{ part }}">
+                    {{ part }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>저자</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-paper-author-container">🔽</button>
+                </div>
+                <div id="liked-paper-author-container" style="display: none;">
+                  {% for author in liked_paper_authors %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-paper-author-filter me-2" value="{{ author }}">
+                    {{ author }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>발행처</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-paper-publisher-container">🔽</button>
+                </div>
+                <div id="liked-paper-publisher-container" style="display: none;">
+                  {% for publisher in liked_paper_publishers %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-paper-publisher-filter me-2" value="{{ publisher }}">
+                    {{ publisher }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ 좋아요한 저자 전용 필터 그룹 -->
+            <div id="liked-author-filter-group" style="display: none;">
+              <!-- 키워드 필터 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>키워드</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-author-keyword-container">🔽</button>
+                </div>
+                <div id="liked-author-keyword-container" style="display: none;">
+                  {% for keyword in liked_author_keywords %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-author-keyword-filter me-2" value="{{ keyword }}">
+                    {{ keyword }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 기관 필터 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>기관</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-author-affiliation-container">🔽</button>
+                </div>
+                <div id="liked-author-affiliation-container" style="display: none;">
+                  {% for aff in liked_author_affiliations %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-author-affiliation-filter me-2" value="{{ aff }}">
+                    {{ aff }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ 좋아요한 기관 전용 필터 그룹 -->
+            <div id="liked-affiliation-filter-group" style="display: none;">
+              <!-- 국가 필터 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>국가</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-affiliation-country-container">🔽</button>
+                </div>
+                <div id="liked-affiliation-country-container" style="display: none;">
+                  {% for country in liked_affiliation_countries %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-affiliation-country-filter me-2" value="{{ country }}">
+                    {{ country }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 키워드 필터 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>키워드</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-affiliation-keyword-container">🔽</button>
+                </div>
+                <div id="liked-affiliation-keyword-container" style="display: none;">
+                  {% for keyword in liked_affiliation_keywords %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-affiliation-keyword-filter me-2" value="{{ keyword }}">
+                    {{ keyword }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 저자 필터 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>저자</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-affiliation-author-container">🔽</button>
+                </div>
+                <div id="liked-affiliation-author-container" style="display: none;">
+                  {% for author in liked_affiliation_authors %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-affiliation-author-filter me-2" value="{{ author }}">
+                    {{ author }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ 좋아요한 나라 전용 필터 그룹 -->
+            <div id="liked-country-filter-group" style="display: none;">
+              <!-- 주요 키워드 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>키워드</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-country-keyword-container">🔽</button>
+                </div>
+                <div id="liked-country-keyword-container" style="display: none;">
+                  {% for keyword in liked_country_keywords %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-country-keyword-filter me-2" value="{{ keyword }}">
+                    {{ keyword }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- 주요 기관 -->
+              <div class="list-group mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>기관</strong>
+                  <button class="btn btn-sm btn-light toggle-btn" data-target="liked-country-affiliation-container">🔽</button>
+                </div>
+                <div id="liked-country-affiliation-container" style="display: none;">
+                  {% for aff in liked_country_affiliations %}
+                  <label class="list-group-item d-flex align-items-center">
+                    <input type="checkbox" class="filter-checkbox liked-country-affiliation-filter me-2" value="{{ aff }}">
+                    {{ aff }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- /#filter-section -->
+        </div>   <!-- /#filter-sidebar -->
+
+      </div> <!-- /.list-group -->
+    </div>   <!-- /.col-md-2 (sidebar) -->
+
+    <!-- 🖥️ 중앙 콘텐츠: JS로만 채움 -->
+    <div class="col-md-10" id="main-content"></div>
+
+  </div> <!-- /.row -->
+</div>   <!-- /.container-fluid -->
+
+
+
+    <!-- 🛠️ 내 정보 (숨겨진 상태) -->
+    <div class="card shadow-sm d-none" id="user-info">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">내 정보</h3>
+        </div>
+
+        <div class="card-body">
+            <!-- 👤 내 정보 -->
+            <div id="user-info-section" class="d-none">
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>사용자명:</strong> {{ user.user_name }}</li>
+                    <li class="list-group-item"><strong>이메일:</strong> {{ user.email }}</li>
+                </ul>
+
+                <div class="mt-4">
+                    <h5>🔑 비밀번호 변경</h5>
+                    <form id="change-password-form">
+                    <div class="mb-3">
+                        <label for="current-password" class="form-label">현재 비밀번호</label>
+                        <input type="password" id="current-password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">새 비밀번호</label>
+                        <input type="password" id="new-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline-itrt">비밀번호 변경</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 🕒 최근 본 논문 -->
+            <div id="recent-papers-section" class="d-none">
+                <ul class="list-group">
+                    {% for paper in recent_papers|slice:":10" %}
+                    <li class="list-group-item recent-paper-item mb-2 border rounded shadow-sm paper-item">
+                    <div class="recent-paper-text">
+                        <strong class="fw-bold mb-1">{{ paper.1 }}</strong>
+                        <small class="text-muted d-block">조회일: {{ paper.2 }}</small>
+                    </div>
+                    <div class="recent-paper-button">
+                        <a href="{% url 'paper_page' paper.0 %}" class="btn btn-outline-itrt btn-sm">상세보기</a>
+                    </div>
+                    </li>
+                    {% empty %}
+                    <p class="text-muted">최근 본 논문이 없습니다.</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+<!-- 로그아웃 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const logoutButton = document.querySelector('.btn-logout');
+
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function () {
+                fetch('/logout/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('로그아웃 성공!');
+                        window.location.href = '/';
+                    } else {
+                        alert('로그아웃 실패!');
+                    }
+                });
+            });
+        }
+
+ 
+        function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const [key, value] = cookie.trim().split('=');
+                if (key === name) {
+                    return decodeURIComponent(value);
+                }
+            }
+            return null;
+        }
+    });
+</script>
+
+
+<!-- ✅ JavaScript: 버튼 클릭 시 해당 콘텐츠만 보이게 처리 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const contentContainer = document.getElementById("main-content");
+        const contentTitle = document.getElementById("content-title");
+
+        // 버튼 요소 가져오기
+        const savedPapersBtn = document.getElementById("show-saved-papers");
+        const userInfoBtn = document.getElementById("show-user-info");
+        const recentPapersBtn = document.getElementById("show-recent-papers");
+
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+
+        const likedPapersBtn = document.getElementById("show-liked-papers");
+        const likedAuthorsBtn = document.getElementById("show-liked-authors");
+        
+        const recommendedPapersBtn = document.getElementById("show-recommended-papers"); // ✅ 추천 논문 버튼 요소 가져오기
+
+        const likedItemsMenu = document.getElementById("liked-items-menu");
+        const likedItemsContainer = document.getElementById("liked-items-container");
+
+        // ✅ 저장된 논문 리스트 및 좋아요한 논문 리스트 가져오기
+        const paperLists = ["#saved-papers-list .list-group-item", "#liked-papers-list .list-group-item"];
+        
+        let currentFilterGroup = "saved"; // 기본값
+
+        function showFilterGroup(type) {
+            const sidebar = document.getElementById("filter-sidebar");
+
+            // ✅ 상태를 "무조건" 먼저 갱신
+            currentFilterGroup = type;
+
+            // ✅ 필터 표시할 필요 없는 타입은 사이드바 전체 숨기기
+            if (["recommended", "recent", "pdf", "userinfo", "liked-keyword", "none"].includes(type)) {
+                sidebar.style.display = "none";
+                return; // ← 이제도 OK (상태는 이미 갱신됨)
+            } else {
+                sidebar.style.display = "block";
+            }
+        // 모든 필터 그룹 숨기기
+        document.getElementById("saved-filter-group").style.display = "none";
+        document.getElementById("liked-paper-filter-group").style.display = "none";
+        document.getElementById("liked-author-filter-group").style.display = "none";
+        document.getElementById("liked-affiliation-filter-group").style.display = "none";
+        document.getElementById("liked-country-filter-group").style.display = "none";
+
+        // 해당 필터만 표시
+        if (type === "saved") {
+            document.getElementById("saved-filter-group").style.display = "block";
+        } else if (type === "liked-paper") {
+            document.getElementById("liked-paper-filter-group").style.display = "block";
+        } else if (type === "liked-author") {
+            document.getElementById("liked-author-filter-group").style.display = "block";
+        } else if (type === "liked-affiliation") {
+            document.getElementById("liked-affiliation-filter-group").style.display = "block";
+        } else if (type === "liked-country") {
+            document.getElementById("liked-country-filter-group").style.display = "block";
+        }else if (type === "liked-keyword") {
+        // ✅ 키워드 들어오면 전부 숨기고 아무것도 표시 안 함
+        return;
+        }else if (type === "none") {
+        // ⭐️ 추천 논문은 필터 숨기기
+        return;
+        }
+
+        // ⭐️ 현재 상태 저장
+        currentFilterGroup = type;
+    }
+
+
+    // ✅ 페이지 로드 시 필터 그룹 기본 표시
+    showFilterGroup('saved');
+
+    // 좋아요 드롭다운 클릭 시 (논문 제외, 저자/기관/나라만)
+    // ✅ 좋아요한 저자, 기관, 나라 클릭 시 필터 표시 + 데이터 가져오기
+    document.querySelectorAll(".liked-item-option").forEach(item => {
+        item.addEventListener("click", function () {
+            const type = this.getAttribute("data-type");
+            fetchLikedItems(type); // 좋아요한 데이터 가져오기
+
+            if (type === "authors") {
+                showFilterGroup("liked-author");
+            } else if (type === "affiliations") {
+                showFilterGroup("liked-affiliation");
+            } else if (type === "countries") {
+                showFilterGroup("liked-country");
+            }
+        });
+    });
+
+
+    // 저장된 논문 클릭 시
+    if (savedPapersBtn) {
+    savedPapersBtn.addEventListener("click", function () {
+        showSection(savedPapersSection, "📑 저장된 논문 목록", "default");
+        showFilterGroup("saved");
+
+        clearOtherFilters(["liked-author-filter-group", "liked-affiliation-filter-group", "liked-country-filter-group", "liked-paper-filter-group"]);
+        filterPapers();
+    });
+
+
+    // 좋아요한 논문 클릭 시
+    if (likedPapersBtn) {
+    likedPapersBtn.addEventListener("click", function () {
+        fetchLikedItems("papers");
+        showFilterGroup("liked-paper");
+
+        // ✅ 필요하면 필터 초기화만 남기고, filterPapers 호출은 제거
+        clearOtherFilters(["liked-author-filter-group", "liked-affiliation-filter-group", "liked-country-filter-group"]);
+    });
+}}
+
+    // 필터 체크박스 초기화 함수
+    function clearOtherFilters(groupIds) {
+        groupIds.forEach(groupId => {
+            const checkboxes = document.querySelectorAll(`#${groupId} .filter-checkbox`);
+            checkboxes.forEach(cb => cb.checked = false);
+        });
+    }
+        // 좋아요 목록 선택 이벤트
+        likedItemsMenu.addEventListener("click", function (event) {
+            if (event.target.classList.contains("liked-item-option")) {
+                const type = event.target.getAttribute("data-type");
+                fetchLikedItems(type);
+            }
+        });
+        function fetchLikedItems(type) {
+        fetch("/liked-items/")
+            .then(response => response.json())
+            .then(data => {
+                let contentHTML = "";
+                let title = "";
+                let sectionType = "liked";  // ✅ 좋아요한 항목은 빨간색 배경
+
+                switch (type) {
+                    case "papers":
+                        currentFilterGroup = "liked-paper";
+                        showFilterGroup("liked-paper");
+
+                        // ✅ 데이터 저장 후 바로 렌더링
+                        likedPapersData = data.liked_papers;
+                        renderLikedPapers();
+                        return; // 논문은 바로 렌더링하고 종료
+                    case "authors":
+                        contentHTML = generateLikedAuthorsHTML(data.liked_authors);
+                        title = " 좋아요 저자";
+                        currentFilterGroup = "liked-author";
+                        showFilterGroup("liked-author");
+                        break;
+                    case "affiliations":
+                        contentHTML = generateLikedAffiliationsHTML(data.liked_affiliations);
+                        title = " 좋아요 기관";
+                        currentFilterGroup = "liked-affiliation";
+                        showFilterGroup("liked-affiliation");
+                        break;
+                    case "countries":
+                        contentHTML = generateLikedCountriesHTML(data.liked_countries);
+                        title = " 좋아요 나라";
+                        currentFilterGroup = "liked-country";
+                        showFilterGroup("liked-country");
+                        break;
+                    case "keywords":
+                        contentHTML = generateLikedKeywordsHTML(data.liked_keywords);
+                        title = " 좋아요 키워드";
+                        currentFilterGroup = "liked-keyword";  // ⭐️ 필터 숨기기용
+                        showFilterGroup("liked-keyword");      // 필터 전부 숨김 처리
+                        break;
+                }
+
+                showSection(contentHTML, title, sectionType);
+            })
+            .catch(error => console.error("좋아요한 데이터를 불러오는 데 실패했습니다:", error));
+        }
+
+
+
+    toggleButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const targetId = this.getAttribute("data-target");
+            const targetContainer = document.getElementById(targetId);
+
+            if (targetContainer.style.display === "none" || targetContainer.style.display === "") {
+                targetContainer.style.display = "block";
+                this.innerHTML = "🔽"; // ▼ 버튼으로 변경
+            } else {
+                targetContainer.style.display = "none";
+                this.innerHTML = "🔼"; // ▲ 버튼으로 변경
+            }
+        });
+    });
+
+        // 필터
+        const checkboxes = document.querySelectorAll(".filter-checkbox");
+        const papersList = document.getElementById("saved-papers-list");
+
+        // 필터 체크박스 변경 시 필터링 적용
+        checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", function () {
+            filterPapers();
+        });
+    });
+
+    let likedPapersData = [];  // 최초 1번만 fetch해서 저장
+    let likedPapersPage = 1;
+    let previousPage = 1;
+    let isFilterActive = false;
+    const likedPapersPerPage = 10;
+
+    // ✅ 좋아요한 논문 데이터 최초 1회 fetch
+    function loadLikedPapersData() {
+        if (likedPapersData.length > 0) { // 이미 불러왔으면 fetch 안 함
+            renderLikedPapers();
+            return;
+        }
+
+        fetch("/liked-items/")
+            .then(response => response.json())
+            .then(data => {
+                likedPapersData = data.liked_papers;
+                renderLikedPapers();
+            })
+            .catch(error => console.error("좋아요한 논문 데이터를 불러오는 데 실패:", error));
+    }
+
+    // ✅ 좋아요한 논문 렌더링 (필터 포함)
+    function renderLikedPapers() {
+        const selectedYears = Array.from(document.querySelectorAll(".liked-paper-year-filter:checked")).map(cb => cb.value);
+        const selectedParts = Array.from(document.querySelectorAll(".liked-paper-part-filter:checked")).map(cb => cb.value);
+        const selectedPublishers = Array.from(document.querySelectorAll(".liked-paper-publisher-filter:checked")).map(cb => cb.value);
+        const selectedAuthors = Array.from(document.querySelectorAll(".liked-paper-author-filter:checked")).map(cb => cb.value);
+
+        let filteredPapers = likedPapersData;
+
+        if (selectedYears.length || selectedParts.length || selectedPublishers.length || selectedAuthors.length) {
+            if (!isFilterActive) previousPage = likedPapersPage;
+            likedPapersPage = 1;
+            isFilterActive = true;
+
+            filteredPapers = likedPapersData.filter(paper => {
+                const yearMatch = selectedYears.length === 0 || selectedYears.includes(paper.year.toString());
+                const partMatch = selectedParts.length === 0 || selectedParts.includes(paper.parts);
+                const publisherMatch = selectedPublishers.length === 0 || selectedPublishers.includes(paper.published_in);
+                const authorMatch = selectedAuthors.length === 0 || selectedAuthors.some(author => (paper.authors || "").includes(author));
+                return yearMatch && partMatch && publisherMatch && authorMatch;
+            });
+        } else {
+            if (isFilterActive) likedPapersPage = previousPage;
+            isFilterActive = false;
+        }
+
+        const html = generateLikedPapersHTML(filteredPapers, likedPapersPage);
+        showSection(html, " 좋아요 논문", "liked");
+    }
+
+
+    function filterPapers() {
+        const activeFilters = document.querySelectorAll(".filter-checkbox:checked");
+
+        if (currentFilterGroup === "saved") {
+            // ✅ 저장된 논문 필터
+            const selectedYears = Array.from(document.querySelectorAll(".year-filter:checked")).map(cb => cb.value);
+            const selectedParts = Array.from(document.querySelectorAll(".part-filter:checked")).map(cb => cb.value);
+            const selectedPublishers = Array.from(document.querySelectorAll(".publisher-filter:checked")).map(cb => cb.value);
+            const selectedAuthors = Array.from(document.querySelectorAll(".author-filter:checked")).map(cb => cb.value);
+
+            paperLists.forEach(selector => {
+                const paperItems = document.querySelectorAll(selector);
+                paperItems.forEach(item => {
+                    const paperYear = item.querySelector(".paper-year")?.textContent.trim() || "";
+                    const paperPart = item.querySelector(".paper-part")?.textContent.trim() || "";
+                    const paperPublisher = item.querySelector(".paper-publisher")?.textContent.trim() || "";
+                    const paperAuthors = item.querySelector(".paper-author")?.textContent.trim().split(", ") || [];
+
+                    const yearMatch = selectedYears.length === 0 || selectedYears.includes(paperYear);
+                    const partMatch = selectedParts.length === 0 || selectedParts.includes(paperPart);
+                    const publisherMatch = selectedPublishers.length === 0 || selectedPublishers.includes(paperPublisher);
+                    const authorMatch = selectedAuthors.length === 0 || selectedAuthors.some(author => paperAuthors.includes(author));
+
+                    const pass = (yearMatch && partMatch && publisherMatch && authorMatch);
+                    item.dataset.filterPass = pass ? "1" : "0";   // ← 필터 통과 여부만 기록
+                });
+            });
+              applySavedPagination();
+        } 
+        // ✅ 좋아요한 논문 필터링 처리
+        else if (currentFilterGroup === "liked-paper") {
+            renderLikedPapers();
+        }else if (currentFilterGroup === "liked-author") {
+            // ✅ 좋아요한 저자 필터링
+            const selectedKeywords = Array.from(document.querySelectorAll(".liked-author-keyword-filter:checked")).map(cb => cb.value);
+            const selectedAffiliations = Array.from(document.querySelectorAll(".liked-author-affiliation-filter:checked")).map(cb => cb.value);
+
+            const authorItems = document.querySelectorAll("#liked-authors-list .list-group-item");
+            authorItems.forEach(item => {
+                const pTags = item.querySelectorAll("p");
+                let keywords = [];
+                let affiliation = "";
+
+                pTags.forEach(p => {
+                    if (p.textContent.includes("키워드:")) {
+                        const text = p.textContent.split("키워드:")[1]?.trim();
+                        keywords = text ? text.split(", ") : [];
+                    }
+                    if (p.textContent.includes("기관:")) {
+                        affiliation = p.textContent.split("기관:")[1]?.trim() || "";
+                    }
+                });
+
+                const keywordMatch = selectedKeywords.length === 0 || keywords.some(kw => selectedKeywords.includes(kw));
+                const affiliationMatch = selectedAffiliations.length === 0 || affiliation && selectedAffiliations.some(aff => affiliation.includes(aff));
+
+                item.style.display = (keywordMatch && affiliationMatch) ? "block" : "none";
+            });
+        } else if (currentFilterGroup === "liked-affiliation") {
+            // ✅ 좋아요한 기관 필터링
+            const selectedCountries = Array.from(document.querySelectorAll(".liked-affiliation-country-filter:checked")).map(cb => cb.value);
+            const selectedAuthors = Array.from(document.querySelectorAll(".liked-affiliation-author-filter:checked")).map(cb => cb.value);
+            const selectedKeywords = Array.from(document.querySelectorAll(".liked-affiliation-keyword-filter:checked")).map(cb => cb.value);
+
+            const affiliationItems = document.querySelectorAll("#liked-affiliations-list .list-group-item");
+            affiliationItems.forEach(item => {
+                const pTags = item.querySelectorAll("p");
+                let country = "";
+                let authors = [];
+                let keywords = [];
+
+                pTags.forEach(p => {
+                    const text = p.textContent.trim();
+                    if (text.startsWith("국가:")) {
+                        country = text.replace("국가:", "").trim();
+                    }
+                    if (text.startsWith("주요 저자:")) {
+                        authors = text.replace("주요 저자:", "").split(", ").map(a => a.trim());
+                    }
+                    if (text.startsWith("주요 키워드:")) {
+                        keywords = text.replace("주요 키워드:", "").split(", ").map(k => k.trim());
+                    }
+                });
+
+                const countryMatch = selectedCountries.length === 0 || selectedCountries.includes(country);
+                const authorMatch = selectedAuthors.length === 0 || authors.some(author => selectedAuthors.includes(author));
+                const keywordMatch = selectedKeywords.length === 0 || keywords.some(keyword => selectedKeywords.includes(keyword));
+
+                item.style.display = (countryMatch && authorMatch && keywordMatch) ? "block" : "none";
+            });
+
+        } else if (currentFilterGroup === "liked-country") {
+            // ✅ 좋아요한 나라 필터링
+            const selectedKeywords = Array.from(document.querySelectorAll(".liked-country-keyword-filter:checked")).map(cb => cb.value);
+            const selectedAffiliations = Array.from(document.querySelectorAll(".liked-country-affiliation-filter:checked")).map(cb => cb.value);
+
+            const countryItems = document.querySelectorAll("#liked-countries-list .list-group-item");
+            countryItems.forEach(item => {
+                const pTags = item.querySelectorAll("p");
+                let keywords = [];
+                let institutions = [];
+
+                pTags.forEach(p => {
+                    const text = p.textContent.trim();
+                    if (text.startsWith("주요 키워드:")) {
+                        keywords = text.replace("주요 키워드:", "").split(", ").map(k => k.trim());
+                    }
+                    if (text.startsWith("주요 기관:")) {
+                        institutions = text.replace("주요 기관:", "").split(", ").map(i => i.trim());
+                    }
+                });
+
+                const keywordMatch = selectedKeywords.length === 0 || keywords.some(kw => selectedKeywords.includes(kw));
+                const affiliationMatch = selectedAffiliations.length === 0 || institutions.some(inst => selectedAffiliations.includes(inst));
+
+                item.style.display = (keywordMatch && affiliationMatch) ? "block" : "none";
+            });
+        }
+}
+
+// ✅ 좋아요한 논문 (좌하단: 좋아요 / 우하단: 상세보기)
+function generateLikedPapersHTML(papers, page = 1) {
+  const startIndex = (page - 1) * likedPapersPerPage;
+  const endIndex = startIndex + likedPapersPerPage;
+  const paginatedPapers = papers.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(papers.length / likedPapersPerPage);
+
+  // ✅ 페이지네이션 수정 (처음 / 이전 / 번호 / 다음 / 마지막 포함)
+  const hasPrev = page > 1;
+  const hasNext = page < totalPages;
+
+  const maxButtons = 7;
+  const half = Math.floor(maxButtons / 2);
+  let pStart = Math.max(1, page - half);
+  let pEnd = Math.min(totalPages, pStart + maxButtons - 1);
+  if (pEnd - pStart + 1 < maxButtons) pStart = Math.max(1, pEnd - maxButtons + 1);
+
+  const paginationHTML = totalPages > 1
+    ? `<nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <button class="page-link liked-papers-page-btn" data-page="1" ${hasPrev ? "" : "disabled"}>« 처음</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-papers-page-btn" data-page="${page - 1}" ${hasPrev ? "" : "disabled"}>‹ 이전</button>
+          </li>
+          ${Array.from({ length: pEnd - pStart + 1 }, (_, i) => {
+            const p = pStart + i;
+            return `
+              <li class="page-item ${p === page ? "active" : ""}">
+                <button class="page-link liked-papers-page-btn" data-page="${p}">${p}</button>
+              </li>`;
+          }).join("")}
+          <li class="page-item">
+            <button class="page-link liked-papers-page-btn" data-page="${page + 1}" ${hasNext ? "" : "disabled"}>다음 ›</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-papers-page-btn" data-page="${totalPages}" ${hasNext ? "" : "disabled"}>마지막 »</button>
+          </li>
+        </ul>
+      </nav>`
+    : "";
+
+  // ✅ 나머지 부분은 그대로 유지
+  return `
+    <div class="card-body">
+      <ul class="list-group" id="liked-papers-list">
+        ${paginatedPapers.map(paper => `
+          <li class="list-group-item p-0 border-0">
+            <div class="paper-item">
+              <div class="d-flex flex-column flex-grow-1">
+                <h5 class="fw-bold mb-1">${paper.title}</h5>
+
+                <p class="text-muted abstract-text mb-1"><strong>초록:</strong> ${paper.abstract.substring(0, 180)}...</p>
+                <p class="text-muted mb-1"><strong>키워드:</strong> ${paper.keywords || "정보 없음"}</p>
+                <p class="text-muted mb-1">
+                  <strong>저자:</strong> <span class="paper-author">${paper.authors || "정보 없음"}</span> |
+                  <strong>연도:</strong> <span class="paper-year">${paper.year}</span> |
+                  <strong>인용수:</strong> ${paper.citation}
+                </p>
+                <p class="text-muted mb-0">
+                  <strong>파트:</strong> <span class="paper-part">${paper.parts || "정보 없음"}</span> |
+                  <strong>발행처:</strong> <span class="paper-publisher">${paper.published_in}</span>
+                </p>
+              </div>
+
+              <!-- ❤️ 좌하단 고정 -->
+              <div class="paper-like-fixed">
+                <button class="btn btn-danger btn-sm like-paper" data-paper-id="${paper.id}">
+                  ❤️ 좋아요 (<span id="like-count-${paper.id}">${paper.like_count}</span>)
+                </button>
+              </div>
+              <!-- 📌 우하단 고정 -->
+              <div class="paper-actions-fixed">
+                <a href="/paper/${paper.id}/" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              </div>
+            </div>
+          </li>`).join("")}
+      </ul>
+      ${paginationHTML}
+    </div>`;
+}
+
+
+// ✅ 좋아요한 저자 (처음/이전/번호/다음/마지막 포함)
+function generateLikedAuthorsHTML(authors, page = 1) {
+  const per = likedPapersPerPage || 10;
+  const totalPages = Math.ceil(authors.length / per) || 1;
+  const startIndex = (page - 1) * per;
+  const endIndex = startIndex + per;
+  const paginated = authors.slice(startIndex, endIndex);
+
+  const hasPrev = page > 1;
+  const hasNext = page < totalPages;
+
+  const maxButtons = 7;
+  const half = Math.floor(maxButtons / 2);
+  let pStart = Math.max(1, page - half);
+  let pEnd = Math.min(totalPages, pStart + maxButtons - 1);
+  if (pEnd - pStart + 1 < maxButtons) pStart = Math.max(1, pEnd - maxButtons + 1);
+
+  const paginationHTML = totalPages > 1
+    ? `<nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <button class="page-link liked-authors-page-btn" data-page="1" ${hasPrev ? "" : "disabled"}>« 처음</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-authors-page-btn" data-page="${page - 1}" ${hasPrev ? "" : "disabled"}>‹ 이전</button>
+          </li>
+          ${Array.from({ length: pEnd - pStart + 1 }, (_, i) => {
+              const p = pStart + i;
+              return `
+                <li class="page-item ${p === page ? "active" : ""}">
+                  <button class="page-link liked-authors-page-btn" data-page="${p}">${p}</button>
+                </li>`;
+            }).join("")}
+          <li class="page-item">
+            <button class="page-link liked-authors-page-btn" data-page="${page + 1}" ${hasNext ? "" : "disabled"}>다음 ›</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-authors-page-btn" data-page="${totalPages}" ${hasNext ? "" : "disabled"}>마지막 »</button>
+          </li>
+        </ul>
+      </nav>`
+    : "";
+
+  return `
+    <div class="card-body">
+      <ul class="list-group" id="liked-authors-list">
+        ${paginated.map(author => `
+          <li class="list-group-item p-0 border-0">
+            <div class="paper-item">
+              <div class="d-flex flex-column flex-grow-1">
+                <h5 class="fw-bold mb-1">${author.name}</h5>
+                <p class="text-muted mb-1"><strong>키워드:</strong> ${author.keywords || "정보 없음"}</p>
+                <p class="text-muted mb-1">
+                  <strong>파트:</strong> ${author.parts || "정보 없음"} |
+                  <strong>논문 수:</strong> ${author.paper_count} |
+                  <strong>인용 수:</strong> ${author.citation_count}
+                </p>
+                <p class="text-muted mb-0"><strong>기관:</strong> ${author.affiliation || "정보 없음"}</p>
+              </div>
+
+              <div class="paper-like-fixed">
+                <button class="btn btn-danger btn-sm like-author" data-author-id="${author.id}">
+                  ❤️ 좋아요 (${author.like_count})
+                </button>
+              </div>
+              <div class="paper-actions-fixed">
+                <a href="/author/${author.id}" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              </div>
+            </div>
+          </li>`).join("")}
+      </ul>
+      ${paginationHTML}
+    </div>`;
+}
+
+
+// ✅ 좋아요한 기관 (처음/이전/번호/다음/마지막 포함)
+function generateLikedAffiliationsHTML(affiliations, page = 1) {
+  const per = likedPapersPerPage || 10;
+  const totalPages = Math.ceil(affiliations.length / per) || 1;
+  const startIndex = (page - 1) * per;
+  const endIndex = startIndex + per;
+  const paginated = affiliations.slice(startIndex, endIndex);
+
+  const hasPrev = page > 1;
+  const hasNext = page < totalPages;
+
+  const maxButtons = 7;
+  const half = Math.floor(maxButtons / 2);
+  let pStart = Math.max(1, page - half);
+  let pEnd = Math.min(totalPages, pStart + maxButtons - 1);
+  if (pEnd - pStart + 1 < maxButtons) pStart = Math.max(1, pEnd - maxButtons + 1);
+
+  const paginationHTML = totalPages > 1
+    ? `<nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <button class="page-link liked-affiliations-page-btn" data-page="1" ${hasPrev ? "" : "disabled"}>« 처음</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-affiliations-page-btn" data-page="${page - 1}" ${hasPrev ? "" : "disabled"}>‹ 이전</button>
+          </li>
+          ${Array.from({ length: pEnd - pStart + 1 }, (_, i) => {
+              const p = pStart + i;
+              return `
+                <li class="page-item ${p === page ? "active" : ""}">
+                  <button class="page-link liked-affiliations-page-btn" data-page="${p}">${p}</button>
+                </li>`;
+            }).join("")}
+          <li class="page-item">
+            <button class="page-link liked-affiliations-page-btn" data-page="${page + 1}" ${hasNext ? "" : "disabled"}>다음 ›</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-affiliations-page-btn" data-page="${totalPages}" ${hasNext ? "" : "disabled"}>마지막 »</button>
+          </li>
+        </ul>
+      </nav>`
+    : "";
+
+  return `
+    <div class="card-body">
+      <ul class="list-group" id="liked-affiliations-list">
+        ${paginated.map(affiliation => `
+          <li class="list-group-item p-0 border-0">
+            <div class="paper-item">
+              <div class="d-flex flex-column flex-grow-1">
+                <h5 class="fw-bold mb-1">${affiliation.name}</h5>
+                <p class="text-muted mb-1"><strong>국가:</strong> ${affiliation.country}</p>
+                <p class="text-muted mb-1"><strong>주요 키워드:</strong> ${affiliation.keywords || "정보 없음"}</p>
+                <p class="text-muted mb-0"><strong>주요 저자:</strong> ${affiliation.authors || "정보 없음"}</p>
+              </div>
+
+              <div class="paper-like-fixed">
+                <button class="btn btn-danger btn-sm like-affiliation" data-affiliation-id="${affiliation.id}">
+                  ❤️ 좋아요 (<span id="like-count-${affiliation.id}">${affiliation.like_count}</span>)
+                </button>
+              </div>
+              <div class="paper-actions-fixed">
+                <a href="/affiliation/${affiliation.id}/" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              </div>
+            </div>
+          </li>`).join("")}
+      </ul>
+      ${paginationHTML}
+    </div>`;
+}
+
+
+// ✅ 좋아요한 나라 (처음/이전/번호/다음/마지막 포함)
+function generateLikedCountriesHTML(countries, page = 1) {
+  const per = likedPapersPerPage || 10;
+  const totalPages = Math.ceil(countries.length / per) || 1;
+  const startIndex = (page - 1) * per;
+  const endIndex = startIndex + per;
+  const paginated = countries.slice(startIndex, endIndex);
+
+  const hasPrev = page > 1;
+  const hasNext = page < totalPages;
+
+  const maxButtons = 7;
+  const half = Math.floor(maxButtons / 2);
+  let pStart = Math.max(1, page - half);
+  let pEnd = Math.min(totalPages, pStart + maxButtons - 1);
+  if (pEnd - pStart + 1 < maxButtons) pStart = Math.max(1, pEnd - maxButtons + 1);
+
+  const paginationHTML = totalPages > 1
+    ? `<nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <button class="page-link liked-countries-page-btn" data-page="1" ${hasPrev ? "" : "disabled"}>« 처음</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-countries-page-btn" data-page="${page - 1}" ${hasPrev ? "" : "disabled"}>‹ 이전</button>
+          </li>
+          ${Array.from({ length: pEnd - pStart + 1 }, (_, i) => {
+              const p = pStart + i;
+              return `
+                <li class="page-item ${p === page ? "active" : ""}">
+                  <button class="page-link liked-countries-page-btn" data-page="${p}">${p}</button>
+                </li>`;
+            }).join("")}
+          <li class="page-item">
+            <button class="page-link liked-countries-page-btn" data-page="${page + 1}" ${hasNext ? "" : "disabled"}>다음 ›</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-countries-page-btn" data-page="${totalPages}" ${hasNext ? "" : "disabled"}>마지막 »</button>
+          </li>
+        </ul>
+      </nav>`
+    : "";
+
+  return `
+    <div class="card-body">
+      <ul class="list-group" id="liked-countries-list">
+        ${paginated.map(country => `
+          <li class="list-group-item p-0 border-0">
+            <div class="paper-item">
+              <div class="d-flex flex-column flex-grow-1">
+                <h5 class="fw-bold mb-1">${country.name}</h5>
+                <p class="text-muted mb-1"><strong>주요 키워드:</strong> ${country.keywords || "정보 없음"}</p>
+                <p class="text-muted mb-0"><strong>주요 기관:</strong> ${country.institutions || "정보 없음"}</p>
+              </div>
+
+              <div class="paper-like-fixed">
+                <button class="btn btn-danger btn-sm like-country" data-country-id="${country.id}">
+                  ❤️ 좋아요 (<span id="like-count-${country.id}">${country.like_count}</span>)
+                </button>
+              </div>
+              <div class="paper-actions-fixed">
+                <a href="/country/${country.id}/" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              </div>
+            </div>
+          </li>`).join("")}
+      </ul>
+      ${paginationHTML}
+    </div>`;
+}
+
+
+// ✅ 좋아요한 키워드 (처음/이전/번호/다음/마지막 포함)
+function generateLikedKeywordsHTML(keywords, page = 1) {
+  const per = likedPapersPerPage || 10;
+  const totalPages = Math.ceil(keywords.length / per) || 1;
+  const startIndex = (page - 1) * per;
+  const endIndex = startIndex + per;
+  const paginated = keywords.slice(startIndex, endIndex);
+
+  const hasPrev = page > 1;
+  const hasNext = page < totalPages;
+
+  const maxButtons = 7;
+  const half = Math.floor(maxButtons / 2);
+  let pStart = Math.max(1, page - half);
+  let pEnd = Math.min(totalPages, pStart + maxButtons - 1);
+  if (pEnd - pStart + 1 < maxButtons) pStart = Math.max(1, pEnd - maxButtons + 1);
+
+  const paginationHTML = totalPages > 1
+    ? `<nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <button class="page-link liked-keywords-page-btn" data-page="1" ${hasPrev ? "" : "disabled"}>« 처음</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-keywords-page-btn" data-page="${page - 1}" ${hasPrev ? "" : "disabled"}>‹ 이전</button>
+          </li>
+          ${Array.from({ length: pEnd - pStart + 1 }, (_, i) => {
+              const p = pStart + i;
+              return `
+                <li class="page-item ${p === page ? "active" : ""}">
+                  <button class="page-link liked-keywords-page-btn" data-page="${p}">${p}</button>
+                </li>`;
+            }).join("")}
+          <li class="page-item">
+            <button class="page-link liked-keywords-page-btn" data-page="${page + 1}" ${hasNext ? "" : "disabled"}>다음 ›</button>
+          </li>
+          <li class="page-item">
+            <button class="page-link liked-keywords-page-btn" data-page="${totalPages}" ${hasNext ? "" : "disabled"}>마지막 »</button>
+          </li>
+        </ul>
+      </nav>`
+    : "";
+
+  return `
+    <div class="card-body">
+      <ul class="list-group" id="liked-keywords-list">
+        ${paginated.map(keyword => `
+          <li class="list-group-item p-0 border-0">
+            <div class="paper-item">
+              <div class="d-flex flex-column flex-grow-1" style="max-width:85%;">
+                <h5 class="fw-bold mb-1 text-truncate">${keyword.keyword_name}</h5>
+                <p class="text-muted mb-0" style="
+                  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+                  overflow:hidden;text-overflow:ellipsis;white-space:normal;max-height:3.2em;">
+                  <strong>정의:</strong> ${keyword.definition || "정보 없음"}
+                </p>
+              </div>
+
+              <div class="paper-like-fixed">
+                <button class="btn btn-danger btn-sm like-keyword" data-keyword-id="${keyword.id}">
+                  ❤️ 좋아요 (<span id="like-count-${keyword.id}">${keyword.like_count}</span>)
+                </button>
+              </div>
+              <div class="paper-actions-fixed">
+                <a href="/keyword/${keyword.id}/" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              </div>
+            </div>
+          </li>`).join("")}
+      </ul>
+      ${paginationHTML}
+    </div>`;
+}
+
+// ✅ 좋아요한 저자/기관/나라/키워드 페이지 버튼 클릭 처리
+document.body.addEventListener("click", function (e) {
+  // 공통 헬퍼
+  const go = (which, page) => {
+    fetch("/liked-items/")
+      .then(r => r.json())
+      .then(data => {
+        let html = "";
+        if (which === "authors") {
+          html = generateLikedAuthorsHTML(data.liked_authors || [], page);
+          showSection(html, " 좋아요 저자", "liked");
+          showFilterGroup("liked-author");
+        } else if (which === "affiliations") {
+          html = generateLikedAffiliationsHTML(data.liked_affiliations || [], page);
+          showSection(html, " 좋아요 기관", "liked");
+          showFilterGroup("liked-affiliation");
+        } else if (which === "countries") {
+          html = generateLikedCountriesHTML(data.liked_countries || [], page);
+          showSection(html, " 좋아요 나라", "liked");
+          showFilterGroup("liked-country");
+        } else if (which === "keywords") {
+          html = generateLikedKeywordsHTML(data.liked_keywords || [], page);
+          showSection(html, " 좋아요 키워드", "liked");
+          showFilterGroup("liked-keyword"); // 키워드는 사이드 필터 숨김 로직이면 내부에서 처리됨
+        }
+        // 필터 체크되어 있는 경우 재적용
+        if (typeof filterPapers === "function") filterPapers();
+      });
+  };
+
+  const aBtn = e.target.closest(".liked-authors-page-btn");
+  if (aBtn) {
+    const p = parseInt(aBtn.dataset.page, 10) || 1;
+    go("authors", p);
+    return;
+  }
+
+  const fBtn = e.target.closest(".liked-affiliations-page-btn");
+  if (fBtn) {
+    const p = parseInt(fBtn.dataset.page, 10) || 1;
+    go("affiliations", p);
+    return;
+  }
+
+  const cBtn = e.target.closest(".liked-countries-page-btn");
+  if (cBtn) {
+    const p = parseInt(cBtn.dataset.page, 10) || 1;
+    go("countries", p);
+    return;
+  }
+
+  const kBtn = e.target.closest(".liked-keywords-page-btn");
+  if (kBtn) {
+    const p = parseInt(kBtn.dataset.page, 10) || 1;
+    go("keywords", p);
+    return;
+  }
+});
+
+
+// 📄 저장된 PDF 목록 표시
+function showSavedPdfs() {
+    fetch("/user_saved_pdfs/")
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert("⚠ " + (data.error || "PDF 목록을 불러올 수 없습니다."));
+                return;
+            }
+
+            const pdfs = data.pdfs;
+            const categories = {
+                "paper": "Paper",
+                "author": "Author",
+                "affiliation": "Affiliation",
+                "country": "Country",
+                "keyword": "Keyword"
+            };
+
+            let pdfListHTML = Object.keys(categories).map(category => {
+                const categoryPdfs = pdfs[category] || [];
+                const categoryHTML = categoryPdfs.length > 0
+                    ? categoryPdfs.map(pdf => `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="${pdf.path}" target="_blank" class="text-primary">${pdf.name}</a>
+                            <button class="btn btn-outline-danger btn-sm delete-pdf" data-path="${pdf.path}">🗑️ 삭제</button>
+                        </li>
+                    `).join("")
+                    : `<p class="text-muted">저장된 PDF가 없습니다.</p>`;
+
+                return `
+                    <div class="card shadow-sm mt-3">
+                        <div class="card-body">
+                            <h5 class="mb-2 fw-bold">${categories[category]}</h5>
+                            <ul class="list-group">${categoryHTML}</ul>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            const savedPdfsHTML = `
+                    <div class="card-body">
+                        ${pdfListHTML}
+                    </div>
+            `;
+
+            showSection(savedPdfsHTML, "📄 저장한 PDF", "pdfs");
+
+            // ✅ PDF 삭제 버튼 이벤트 추가
+            document.querySelectorAll(".delete-pdf").forEach(button => {
+                button.addEventListener("click", function () {
+                    deleteSavedPdf(this.getAttribute("data-path"));
+                });
+            });
+        })
+        .catch(error => {
+            alert("❌ 서버 요청 실패: " + error.message);
+            console.error("❌ 서버 요청 실패:", error);
+        });
+}
+
+// 🗑️ PDF 삭제 기능
+function deleteSavedPdf(filePath) {
+    const confirmDelete = confirm("❌ 해당 PDF를 삭제하시겠습니까?");
+    if (!confirmDelete) return;
+
+    const formData = new FormData();
+    formData.append("file_path", filePath);
+
+    fetch("/delete_saved_pdf/", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ PDF가 삭제되었습니다.");
+            showSavedPdfs(); // ✅ 목록 새로고침
+        } else {
+            alert("❌ 삭제 실패: " + (data.error || "알 수 없는 오류"));
+            console.error("삭제 오류:", filePath);
+        }
+    })
+    .catch(error => {
+        alert("❌ 서버 요청 실패: " + error.message);
+        console.error("❌ 서버 요청 실패:", error);
+    });
+}
+
+
+// ✅ 추천 논문 HTML 생성 함수
+function generateRecommendedPapersHTML(papers) {
+  return `
+    <div class="card-body">
+      <ul class="list-group" id="recommended-papers-list">
+        ${papers.map(paper => `
+          <li class="list-group-item p-0 border-0">
+            <div class="mb-4 p-3 border shadow-sm rounded paper-item paper-item--recommended w-100">
+              <div class="flex-grow-1">
+                <h5 class="fw-bold mb-1">${paper.title}</h5>
+
+                <p class="text-muted abstract-text mb-1"><strong>초록:</strong> ${paper.abstract.substring(0, 180)}...</p>
+                <p class="text-muted mb-1"><strong>키워드:</strong> ${paper.keywords || "정보 없음"}</p>
+                <p class="text-muted mb-1">
+                  <strong>저자:</strong> ${paper.authors || "정보 없음"} |
+                  <strong>연도:</strong> ${paper.year} |
+                  <strong>인용수:</strong> ${paper.citation}
+                </p>
+                <p class="text-muted mb-1">
+                  <strong>파트:</strong> ${paper.parts || "정보 없음"} |
+                  <strong>발행처:</strong> ${paper.published_in}
+                </p>
+                <p class="text-muted mb-0">
+                  <strong>저장 수:</strong> ${paper.saved_count ?? 0} |
+                  <strong>추천 이유:</strong> ${paper.reason || "관련 키워드 기반 추천"}
+                </p>
+              </div>
+
+              <!-- ❤️ 좌하단 고정 -->
+              <div class="paper-like-fixed">
+                <button
+                  class="btn ${paper.is_liked ? 'btn-danger' : 'btn-outline-danger'} btn-sm like-paper"
+                  data-paper-id="${paper.id}">
+                  ${paper.is_liked ? '❤️' : '🤍'} 좋아요
+                  (<span id="like-count-${paper.id}">${paper.like_count ?? 0}</span>)
+                </button>
+              </div>
+
+              <!-- 📌 우하단 고정 -->
+              <div class="paper-actions-fixed">
+                <a href="/paper/${paper.id}/" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              </div>
+            </div>
+          </li>
+        `).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+
+
+// ✅ 특정 섹션만 표시 (섹션 타입 유지, 이벤트 재바인딩 유지, 필터 루프 회피 유지)
+function showSection(sectionHTML, title, sectionType = "default") {
+  const contentContainer = document.getElementById("main-content");
+  contentContainer.innerHTML = `
+   <div class="card shadow-sm" data-section="${sectionType}">
+     <div class="section-title">
+       <h3 class="mb-0" id="content-title">${title}</h3>
+     </div>
+     ${sectionHTML}
+   </div>
+ `;
+
+  setTimeout(() => {
+    if (typeof addRemoveEventListeners === "function") addRemoveEventListeners();
+    if (typeof attachLikeEventListeners === "function") attachLikeEventListeners();
+
+    // ✅ 저장 목록일 때만 필터링 적용 (liked-paper는 렌더 함수가 따로 처리)
+    if (typeof filterPapers === "function" && currentFilterGroup === "saved") {
+      filterPapers();
+    }
+  }, 0);
+}
+
+
+// 저장한 논문 목록 
+const savedPapersSection = `
+  <div class="card-body">
+    <ul class="list-group" id="saved-papers-list">
+      {% for paper in saved_papers %}
+        <li class="list-group-item p-0 border-0">
+          <!-- ⬇️ d-flex, align-items-start 제거 -->
+          <div class="mb-4 p-3 border shadow-sm rounded paper-item paper-item--saved w-100">
+            <div class="flex-grow-1">
+              <h5 class="fw-bold mb-1">{{ paper.1 }}</h5>
+
+              <p class="text-muted abstract-text mb-1">
+                <strong>초록:</strong> {{ paper.2|truncatechars:180 }}
+              </p>
+
+              <p class="text-muted mb-1">
+                <strong>키워드:</strong> {{ paper.11|default:"정보 없음" }}
+              </p>
+
+              <p class="text-muted mb-1">
+                <strong>저자:</strong> <span class="paper-author">{{ paper.7|default:"정보 없음" }}</span> |
+                <strong>연도:</strong> <span class="paper-year">{{ paper.3|default:"정보 없음" }}</span> |
+                <strong>인용수:</strong> {{ paper.5|default:"0" }}
+              </p>
+
+              <p class="text-muted mb-0">
+                <strong>파트:</strong> <span class="paper-part">{{ paper.10|default:"정보 없음" }}</span> |
+                <strong>발행처:</strong> <span class="paper-publisher">{{ paper.4|default:"정보 없음" }}</span>
+              </p>
+
+              <p class="text-muted mt-1"><strong>저장일:</strong> {{ paper.6 }}</p>
+            </div>
+
+            <!-- ⬇️ 좌하단 고정: 좋아요 -->
+            <div class="paper-like-fixed">
+              <button class="btn {% if paper.13 %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm like-paper"
+                      data-paper-id="{{ paper.0 }}">
+                {% if paper.13 %}❤️{% else %}🤍{% endif %} 좋아요
+                (<span id="like-count-{{ paper.0 }}">{{ paper.12|default:"0" }}</span>)
+              </button>
+            </div>
+
+            <!-- ⬇️ 우하단 고정: 상세/삭제 -->
+            <div class="paper-actions-fixed d-flex gap-2">
+              <a href="{% url 'paper_page' paper.0 %}" class="btn btn-outline-itrt btn-sm">상세보기</a>
+              <button class="btn btn-outline-danger btn-sm remove-saved-paper" data-paper-id="{{ paper.0 }}">삭제</button>
+            </div>
+          </div>
+        </li>
+      {% empty %}
+        <p class="text-muted">저장된 논문이 없습니다.</p>
+      {% endfor %}
+    </ul>
+    <div id="saved-papers-pagination" class="mt-2"></div>
+  </div>
+`;
+
+
+
+
+// 👤 내 정보 HTML 템플릿
+const userInfoSection = `
+    <div class="card-body">
+        <ul class="list-group">
+            <li class="list-group-item"><strong>사용자명:</strong> {{ user.user_name }}</li>
+            <li class="list-group-item"><strong>이메일:</strong> {{ user.email }}</li>
+        </ul>
+        <div class="mt-4">
+            <h5>🔑 비밀번호 변경</h5>
+            <form id="change-password-form">
+                <div class="mb-3">
+                    <label for="current-password" class="form-label">현재 비밀번호</label>
+                    <input type="password" id="current-password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="new-password" class="form-label">새 비밀번호</label>
+                    <input type="password" id="new-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success">비밀번호 변경</button>
+            </form>
+        </div>
+    </div>
+`;
+
+// 🕒 최근 본 논문 HTML
+const recentPapersSection = `
+  <div class="card-body">
+    <ul class="list-group">
+      {% for paper in recent_papers|slice:":10" %}
+        <li class="list-group-item p-0 border-0">
+          <div class="mb-4 p-3 border shadow-sm rounded paper-item paper-item--recent w-100">
+            <div class="flex-grow-1">
+              <h5 class="fw-bold mb-1">{{ paper.1 }}</h5>
+              <p class="text-muted mb-1"><strong>조회일:</strong> {{ paper.2 }}</p>
+            </div>
+
+            <!-- ❤️ 좌하단 -->
+            <div class="paper-like-fixed">
+              <button
+                class="btn {% if paper.4 %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm like-paper"
+                data-paper-id="{{ paper.0 }}">
+                {% if paper.4 %}❤️{% else %}🤍{% endif %} 좋아요
+                (<span id="like-count-{{ paper.0 }}">{{ paper.3 }}</span>)
+              </button>
+            </div>
+
+            <!-- 📘 우하단 -->
+            <div class="paper-actions-fixed">
+              <a href="{% url 'paper_page' paper.0 %}" class="btn btn-outline-itrt btn-sm">상세보기</a>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+`;
+
+
+// 👤 내 정보 버튼 클릭 시
+if (userInfoBtn) {
+    userInfoBtn.addEventListener("click", function () {
+        showSection(userInfoSection, "내 정보");
+        attachPasswordChangeEvent();
+
+        // ⭐️ 필터 숨기기
+        showFilterGroup("none");
+    });
+}
+
+
+// 🕒 최근 본 논문 버튼 클릭 시
+ if (recentPapersBtn) {
+    recentPapersBtn.addEventListener("click", function () {
+        showSection(recentPapersSection, "최근 본 논문");
+    });
+}
+
+    // 핕터링 좋아요한 # 
+    document.querySelectorAll(".filter-checkbox").forEach(checkbox => {
+    checkbox.addEventListener("change", filterPapers);
+});
+
+
+// 🔑 비밀번호 변경 이벤트 추가 함수
+function attachPasswordChangeEvent() {
+    setTimeout(() => {
+        const passwordForm = document.getElementById("change-password-form");
+        if (passwordForm) {
+            passwordForm.addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const currentPassword = document.getElementById("current-password").value;
+                const newPassword = document.getElementById("new-password").value;
+
+                const response = await fetch("/change_password/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken")
+                    },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("✅ 비밀번호가 성공적으로 변경되었습니다.");
+
+                    // ✅ showSection()을 사용하여 제목까지 정상적으로 표시
+                    showSection(savedPapersSection, "저장된 논문 목록");
+
+                    // ✅ 저장된 논문 삭제 이벤트 다시 추가
+                    addRemoveEventListeners();
+                } else {
+                    alert("⚠ 오류 발생: " + result.error);
+                }
+            });
+        }
+    }, 100);
+}
+
+
+// 이미 바인딩 여부 체크용 플래그
+let removeSavedPaperHandlerBound = false;
+
+// 전역 단일 핸들러 (삭제 버튼 클릭 처리)
+function handleRemoveSavedPaper(event) {
+    if (!event.target.classList.contains("remove-saved-paper")) return;
+
+    const btn = event.target;
+    const paperId = btn.getAttribute("data-paper-id");
+
+    // 연타 방지 (요청 중일 때는 무시)
+    if (btn.dataset.loading === "1") return;
+    btn.dataset.loading = "1";
+
+    if (!confirm("이 논문을 저장 목록에서 삭제하시겠습니까?")) {
+        btn.dataset.loading = "0";
+        return;
+    }
+
+    fetch("/remove_saved_paper/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ paper_id: paperId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ 논문이 저장 목록에서 삭제되었습니다.");
+            btn.closest("li").remove();
+            applySavedPagination();
+        } else {
+            alert("⚠ 삭제 실패: " + (data.error || "알 수 없는 오류"));
+        }
+    })
+    .catch(error => {
+        console.error("⚠ 요청 실패:", error);
+        alert("⚠ 요청 실패: " + error.message);
+    })
+    .finally(() => {
+        btn.dataset.loading = "0";
+    });
+}
+
+// 이벤트 리스너 등록 (중복 방지)
+function addRemoveEventListeners() {
+    if (removeSavedPaperHandlerBound) return;  // 이미 등록된 경우 스킵
+    document.body.addEventListener("click", handleRemoveSavedPaper);
+    removeSavedPaperHandlerBound = true;
+}
+
+
+
+// ===== 저장된 논문 페이지네이션 (처음/이전/다음/마지막 포함) =====
+let savedPapersPage = 1;
+const savedPapersPerPage = 10;
+
+function applySavedPagination() {
+  const list = document.getElementById("saved-papers-list");
+  if (!list) return;
+
+  const items = Array.from(list.querySelectorAll("li.list-group-item"));
+
+  // 초기 로드 등에서 dataset이 없을 수 있으니 기본 통과로 세팅
+  items.forEach(li => {
+    if (li.dataset.filterPass === undefined) li.dataset.filterPass = "1";
+  });
+
+  // 🔑 필터 통과한 항목만 기준으로 페이징
+  const visible = items.filter(li => li.dataset.filterPass !== "0");
+  const totalPages = Math.max(1, Math.ceil(visible.length / savedPapersPerPage));
+
+  // 현재 페이지 보정
+  if (savedPapersPage > totalPages) savedPapersPage = totalPages;
+  if (savedPapersPage < 1) savedPapersPage = 1;
+
+  // 1) 모두 숨기고
+  items.forEach(li => (li.style.display = "none"));
+  // 2) 통과 항목 중 현재 페이지 범위만 보여주기
+  const start = (savedPapersPage - 1) * savedPapersPerPage;
+  const end   = start + savedPapersPerPage;
+  visible.slice(start, end).forEach(li => (li.style.display = "block"));
+
+  // 페이지네이션 렌더
+  const pagWrap = document.getElementById("saved-papers-pagination");
+  if (!pagWrap) return;
+
+  if (totalPages <= 1) {
+    pagWrap.innerHTML = "";
+    return;
+  }
+
+  const hasPrev = savedPapersPage > 1;
+  const hasNext = savedPapersPage < totalPages;
+
+  // 숫자 버튼은 최대 7개 창으로
+  const maxButtons = 7;
+  const half = Math.floor(maxButtons / 2);
+  let pStart = Math.max(1, savedPapersPage - half);
+  let pEnd = Math.min(totalPages, pStart + maxButtons - 1);
+  if (pEnd - pStart + 1 < maxButtons) pStart = Math.max(1, pEnd - maxButtons + 1);
+
+  let html = `<nav><ul class="pagination">`;
+
+  // « 처음 / ‹ 이전
+  html += `
+    <li class="page-item">
+      <button class="page-link saved-papers-page-btn" data-page="1" ${hasPrev ? "" : "disabled"}>« 처음</button>
+    </li>
+    <li class="page-item">
+      <button class="page-link saved-papers-page-btn" data-page="${savedPapersPage - 1}" ${hasPrev ? "" : "disabled"}>‹ 이전</button>
+    </li>
+  `;
+
+  // 숫자 버튼
+  for (let i = pStart; i <= pEnd; i++) {
+    html += `
+      <li class="page-item ${i === savedPapersPage ? "active" : ""}">
+        <button class="page-link saved-papers-page-btn" data-page="${i}">${i}</button>
+      </li>`;
+  }
+
+  // 다음 › / 마지막 »
+  html += `
+    <li class="page-item">
+      <button class="page-link saved-papers-page-btn" data-page="${savedPapersPage + 1}" ${hasNext ? "" : "disabled"}>다음 ›</button>
+    </li>
+    <li class="page-item">
+      <button class="page-link saved-papers-page-btn" data-page="${totalPages}" ${hasNext ? "" : "disabled"}>마지막 »</button>
+    </li>
+  `;
+
+  html += `</ul></nav>`;
+  pagWrap.innerHTML = html;
+}
+
+
+// (이미 전역 위임이 있으면 생략 가능)
+document.body.addEventListener("click", function (e) {
+  const btn = e.target.closest(".saved-papers-page-btn");
+  if (!btn) return;
+  savedPapersPage = parseInt(btn.getAttribute("data-page"), 10) || 1;
+  applySavedPagination();
+});
+
+
+//좋아요
+document.body.addEventListener("click", function (event) {
+    // ✅ 논문 좋아요 버튼 클릭 이벤트
+    if (event.target.classList.contains("like-paper")) {
+        const paperId = event.target.getAttribute("data-paper-id");
+        const likeButton = event.target;
+
+        console.log(`🔥 좋아요 버튼 클릭됨! 논문 ID: ${paperId}`);
+
+        fetch(`/like_paper/${paperId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),  
+                "Content-Type": "application/json"
+            },
+            credentials: "include"  // 🔥 로그인 세션 유지
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert("❌ 로그인 후 이용 가능합니다!");
+                    window.location.href = "/login";  
+                }
+                throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.liked) {
+                likeButton.innerHTML = `❤️ 좋아요 (<span id="like-count-${paperId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-danger");  // ✅ 좋아요 상태 스타일 변경
+                likeButton.classList.remove("btn-outline-danger");
+            } else {
+                likeButton.innerHTML = `🤍 좋아요 (<span id="like-count-${paperId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-outline-danger");  // ✅ 좋아요 취소 상태 스타일 변경
+                likeButton.classList.remove("btn-danger");
+            }
+        })
+        .catch(error => console.error("⚠ AJAX 요청 오류:", error));
+    }
+
+    // ✅ 저자 좋아요 버튼 클릭 이벤트
+    if (event.target.classList.contains("like-author")) {
+        const authorId = event.target.getAttribute("data-author-id");
+        const likeButton = event.target;
+
+        console.log(`🔥 좋아요 버튼 클릭됨! 저자 ID: ${authorId}`);
+
+        fetch(`/like_author/${authorId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),  
+                "Content-Type": "application/json"
+            },
+            credentials: "include"  // 🔥 로그인 세션 유지
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert("❌ 로그인 후 이용 가능합니다!");
+                    window.location.href = "/login";  
+                }
+                throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.liked) {
+                likeButton.innerHTML = `❤️ 좋아요 (<span id="like-count-${authorId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-danger");  // ✅ 좋아요 상태 스타일 변경
+                likeButton.classList.remove("btn-outline-danger");
+            } else {
+                likeButton.innerHTML = `🤍 좋아요 (<span id="like-count-${authorId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-outline-danger");  // ✅ 좋아요 취소 상태 스타일 변경
+                likeButton.classList.remove("btn-danger");
+            }
+        })
+        .catch(error => console.error("⚠ AJAX 요청 오류:", error));
+    }
+
+    // ✅ 기관 좋아요 버튼 클릭 이벤트
+    if (event.target.classList.contains("like-affiliation")) {
+        const affiliationId = event.target.getAttribute("data-affiliation-id");
+        const likeButton = event.target;
+
+        console.log(`🔥 좋아요 버튼 클릭됨! 기관 ID: ${affiliationId}`);
+
+        fetch(`/like_affiliation/${affiliationId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.liked) {
+                likeButton.innerHTML = `❤️ 좋아요 (<span id="like-count-${affiliationId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-danger");
+                likeButton.classList.remove("btn-outline-danger");
+            } else {
+                likeButton.innerHTML = `🤍 좋아요 (<span id="like-count-${affiliationId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-outline-danger");
+                likeButton.classList.remove("btn-danger");
+            }
+        })
+        .catch(error => console.error("⚠ AJAX 요청 오류:", error));
+    }
+
+    // ✅ 나라 좋아요 버튼 클릭 이벤트
+    if (event.target.classList.contains("like-country")) {
+        const countryId = event.target.getAttribute("data-country-id");
+        const likeButton = event.target;
+
+        console.log(`🔥 좋아요 버튼 클릭됨! 나라 ID: ${countryId}`);
+
+        fetch(`/like_country/${countryId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.liked) {
+                likeButton.innerHTML = `❤️ 좋아요 (<span id="like-count-${countryId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-danger");
+                likeButton.classList.remove("btn-outline-danger");
+            } else {
+                likeButton.innerHTML = `🤍 좋아요 (<span id="like-count-${countryId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-outline-danger");
+                likeButton.classList.remove("btn-danger");
+            }
+        })
+        .catch(error => console.error("⚠ AJAX 요청 오류:", error));
+    }
+
+    // ✅ 키워드 좋아요 버튼 클릭 이벤트
+    if (event.target.classList.contains("like-keyword")) {
+        const keywordId = event.target.getAttribute("data-keyword-id");
+        const likeButton = event.target;
+
+        console.log(`🔥 좋아요 버튼 클릭됨! 키워드 ID: ${keywordId}`);
+
+        fetch(`/like_keyword/${keywordId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.liked) {
+                likeButton.innerHTML = `❤️ 좋아요 (<span id="like-count-${keywordId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-danger");
+                likeButton.classList.remove("btn-outline-danger");
+            } else {
+                likeButton.innerHTML = `🤍 좋아요 (<span id="like-count-${keywordId}">${data.count}</span>)`;
+                likeButton.classList.add("btn-outline-danger");
+                likeButton.classList.remove("btn-danger");
+            }
+        })
+        .catch(error => console.error("⚠ AJAX 요청 오류:", error));
+    }
+});
+
+// ✅ 저장된 논문 버튼 클릭 시 (기본 파란색)
+document.getElementById("show-saved-papers").addEventListener("click", function () {
+    showSection(savedPapersSection, "저장된 논문 목록", "default");
+    showFilterGroup("saved"); // ✅ 필터도 변경
+    applySavedPagination();
+});
+
+// ✅ 최근 본 논문 버튼 클릭 시 (기본 파란색)
+document.getElementById("show-recent-papers").addEventListener("click", function () {
+    showSection(recentPapersSection, "최근 본 논문 (10개)", "recent");
+    showFilterGroup("none"); // ✅ 필터 숨기기
+});
+
+// ✅ 추천 논문 버튼 클릭 시 (노란색 배경)
+document.getElementById("show-recommended-papers").addEventListener("click", function () {
+    fetch("/recommended_papers/")
+        .then(response => response.json())
+        .then(data => {
+            const recommendedPapersHTML = generateRecommendedPapersHTML(data.recommended_papers);
+            showSection(recommendedPapersHTML, "추천 논문", "recommended");
+
+            // ⭐️ 필터 숨기기
+            showFilterGroup("none");
+        })
+        .catch(error => console.error("추천 논문 데이터를 불러오는 데 실패했습니다:", error));
+});
+
+
+// ✅ 저장된 PDF 버튼 클릭 시 (회색 배경)
+document.getElementById("show-saved-pdfs").addEventListener("click", function () {
+    showSavedPdfs(); // 내부적으로 showSection 호출
+    showFilterGroup("none"); // ✅ 필터 숨기기
+});
+
+
+// ✅ 페이지네이션 버튼 클릭 시 이벤트 처리
+document.body.addEventListener("click", function (event) {
+  if (event.target.classList.contains("liked-papers-page-btn")) {
+    likedPapersPage = parseInt(event.target.getAttribute("data-page"), 10);
+
+    // ❌ 매번 서버 재요청 + showSection → filterPapers 루프
+    // fetch("/liked-items/")...
+
+    // ✅ 캐시 + 렌더만
+    renderLikedPapers();
+  }
+});
+
+
+
+// 필터 체크박스 변경 시 필터 적용
+document.querySelectorAll(".filter-checkbox").forEach(checkbox => {
+    checkbox.addEventListener("change", filterPapers);
+});
+
+
+// ✅ CSRF 토큰을 가져오는 함수
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+        // ✅ 페이지 로드 시 저장 논문 목록 표시
+        showSection(savedPapersSection, "저장된 논문 목록");
+        applySavedPagination();
+    });
+</script>
+
+<script>
+  (function(){
+    // Django 템플릿에서 받아온 liked_papers_json
+    const raw = '{{ liked_papers_json|escapejs }}';
+    const txt = (raw || '').trim();
+
+    try {
+      // JSON 형식이 올바른 경우
+      window.likedPapersData = txt ? JSON.parse(txt) : [];
+    } catch (e) {
+      console.error('❌ liked_papers_json 파싱 실패:', e, txt);
+      // 파싱 오류 시 빈 배열로 초기화
+      window.likedPapersData = [];
+    }
+  })();
+</script>
+
+
+
+{% endblock %}

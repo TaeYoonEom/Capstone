@@ -1,0 +1,574 @@
+
+    /* 1) 국가 상세정보 테이블 기본 스타일 */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 2) 테이블 헤더 보라색 스타일 */
+    .custom-table th {
+        background: linear-gradient(135deg, #6a0dad, #9b59b6);
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        padding: 1px;
+        border-bottom: 2px solid #9b59b6;
+    }
+
+    /* 3) 테이블 셀 정렬 및 구분선 */
+    .custom-table td {
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    /* 4) 홀수 행 배경 보라색 */
+    .custom-table tr:nth-child(odd) {
+        background-color: #faf5ff;
+    }
+
+    /* 5) 행에 마우스 오버 시 효과 */
+    .custom-table tr:hover {
+        background-color: #f3e5f5;
+        transition: 0.3s ease-in-out;
+    }
+
+    /* 6) 마지막 행 아래 선 제거 */
+    .custom-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* 7) 키워드 스타일 박스 */
+    .keyword-box {
+        background-color: #f3e5f5;
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin-right: 5px;
+        display: inline-block;
+    }
+
+    /* 8) 저자 링크 기본 스타일 */
+    .author-link {
+        text-decoration: none;
+        color: #3e3d3e;
+    }
+
+    /* 9) 저자 링크 마우스오버 강조 */
+    .author-link:hover {
+        color: #6a0dad;
+        font-weight: bold;
+    }
+
+    /* 10) 정성적 분석 박스 기본 구조 */
+    .analysis-box {
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 11) 워드클라우드 영역 조정 */
+    #wordcloud {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+    }
+
+    /* 12) 페이지네이션 정렬 */
+    /* .pagination {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+    } */
+     /* ✅ 페이지네이션 전체 컨테이너 스타일 */
+.pagination {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: -50px;
+  justify-content: center;  /* ✅ 가운데 정렬 */
+}
+
+/* ✅ 기본 페이지 버튼 스타일 */
+.page-btn {
+  border: 1px solid #D1C4E9;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  color: #1d1d1d;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+/* ✅ 비활성(비클릭) 버튼 */
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ✅ 마우스를 올렸을 때, 클릭했을 때, 포커스했을 때 */
+.page-btn:hover,
+.page-btn:focus,
+.page-btn:focus-visible,
+.page-btn:active {
+  background-color: #E0E2E8 !important;
+  border-color: #D5D7DC !important;
+  color: #1d1d1d !important;
+  box-shadow: 0 0 0 0.15rem rgba(105, 0, 184, 0.15) !important;
+  outline: none !important;
+}
+
+/* ✅ 현재 활성 페이지 버튼 (보라색) */
+.page-btn.active {
+  background: #6900B8 !important;
+  color: #fff !important;
+  border-color: #6900B8 !important;
+}
+
+
+    /* 13) 좋아요 버튼 위치 설정 */
+    .like-button-container {
+        margin-top: 0 !important;
+        display: inline-block;
+    }
+
+    /* 14) 좋아요 버튼 스타일 설정 */
+    .like-button-container .like-paper {
+        font-size: 16px !important;
+        padding: 8px 15px !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease-in-out;
+    }
+/* ==========================
+   연관 논문 리스트 레이아웃 고정
+   ========================== */
+/* 기본 상태: 회색 (#444~#555) */
+.meta-authors a {
+  color: #555 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+}
+
+/* 호버 시: 짙은 보라색 포인트 */
+.meta-authors a:hover {
+  color: #6900B8 !important;
+  text-decoration: underline;
+}
+
+/* 부모가 .text-center 여도 리스트/카드는 좌정렬 유지 */
+.related-list,
+.related-list * {
+  text-align: left !important;     /* ✅ 강제 좌정렬 */
+}
+
+/* 리스트: 세로 스택 + 자식 폭 100% 확장 */
+.related-list{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;            /* ✅ 카드 가로 100% */
+  gap: 10px;
+  padding: 0;
+}
+
+/* 카드: 논문 상세와 동일 — 항상 100% 폭 */
+.paper-card{
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;   /* 체크박스 | 본문 | 우측메타(있을 때) */
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #EEE8F8;
+  border-radius: 14px;
+  background: #fff;
+  transition: box-shadow .2s ease, transform .06s ease, background .2s ease;
+}
+.paper-card:hover{
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(105,0,184,.12);
+  transform: translateY(-1px);
+}
+
+/* 체크박스 열 정렬 */
+.paper-card .check-col{ display:flex; align-items:center; justify-content:center; }
+
+/* ==========================
+   타이포 리셋 + 메타 라인 스타일
+   ========================== */
+.paper-card, .paper-card *{
+  font-family: inherit !important;   /* ✅ 이상한 폰트 상속 차단 */
+  font-style: normal !important;     /* ✅ 기울임 방지 */
+  letter-spacing: normal;
+}
+
+.paper-card .body-col{
+  display:flex; flex-direction:column; gap:6px;
+}
+
+/* 제목 */
+.paper-card .paper-title{
+  margin:0; font-weight:700; font-size:16px; line-height:1.35; color:#1D1D1D;
+}
+.paper-card .paper-title a{ color:inherit; text-decoration:none; }
+.paper-card .paper-title a:hover{ color:#6900B8; text-decoration:underline; }
+
+/* 메타 한 줄(저자/키워드/파트·연도) */
+.meta-line{ display:block; font-size:14px; color:#333; line-height:1.4; }
+.meta-label{ font-weight:700; color:#4C4C4C; margin-right:6px; }
+
+/* 키워드 pill — 논문 상세와 동일 톤 */
+.tag{
+  display:inline-block; padding:4px 8px;
+  border:1px solid #E0D5F4; border-radius:8px;
+  background:#F8F5FF; color:#4A2C7F; font-size:12px; line-height:1;
+  margin-right:6px; margin-bottom:4px;
+}
+
+/* 파트 | 연도 구분자 */
+.meta-partyear .sep{ display:inline-block; margin:0 10px; color:#B7A9D8; font-weight:600; }
+
+/* 우측 메타(있을 때만) */
+.right-col{
+  display:flex; flex-direction:column; gap:10px;
+  justify-content:center; align-items:flex-end; min-width:120px;
+}
+
+/* 반응형: 우측 메타를 아래로 */
+@media (max-width: 768px){
+  .paper-card{ grid-template-columns:28px 1fr; }
+  .right-col{ grid-column:1 / -1; align-items:flex-start; flex-direction:row; gap:8px; }
+}
+
+/* 카드/리스트 쪽은 작은 라벨 */
+.meta-line{ display:block; font-size:14px; color:#333; line-height:1.4; }
+.meta-label{ font-weight:700; color:#4C4C4C; margin-right:6px; }
+
+/* 카드 내부는 어떤 상위 text-center 영향에도 좌정렬/일반 폰트 유지 */
+.paper-card, .paper-card *{
+  text-align: left !important;
+  font-family: inherit !important;
+  font-style: normal !important;
+  letter-spacing: normal;
+}
+
+/* 키워드 pill(카드) */
+.tag{
+  display:inline-block; padding:4px 8px; border:1px solid #E0D5F4; border-radius:8px;
+  background:#F8F5FF; color:#4A2C7F; font-size:12px; line-height:1;
+  margin-right:6px; margin-bottom:4px;
+}
+/* 5) 좌측 체크박스 칼럼 (시각 정렬) */
+.paper-card .check-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.paper-card .check-col .form-check-input {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  border-color: #CBB6EE;
+}
+.paper-card .check-col .form-check-input:checked {
+  background-color: #6900B8;
+  border-color: #6900B8;
+}
+/* ==========================
+   헤더 컴팩트 + 브레드크럼 호버 효과
+   ========================== */
+
+/* 1) 헤더 높이 축소(컴팩트) */
+.hero-compact {
+  /* 상하 패딩 축소: 기존 py-5(약 3rem) → 1.75rem로 축소 */
+  padding-block: 1.75rem !important;
+}
+
+/* 반응형에서 조금만 키움 */
+@media (min-width: 992px) {
+  .hero-compact { padding-block: 2.25rem !important; }
+}
+
+/* 2) 제목 여백/크기 살짝 줄이기 */
+.hero-compact .page-title {
+  margin-bottom: 0.6rem;   /* 제목-브레드크럼 간격 축소 */
+  line-height: 1.2;
+}
+
+/* 3) 브레드크럼 카드 자체도 슬림하게 */
+.crumb-card {
+  padding: 6px 10px !important;   /* 카드 안쪽 여백 축소 */
+  border-radius: 10px;
+}
+
+/* 4) 링크에 호버 효과 (부드러운 하이라이트 + 살짝 떠오름) */
+.crumb-link {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: #ffffff;                /* 기본 흰색 */
+  text-decoration: none;
+  transition: all .25s ease;
+}
+.crumb-link:hover,
+.crumb-link:focus {
+  background: rgba(255,255,255,0.22);
+  color: #6900B8 !important;     /* 💜 연보라 텍스트 */
+  box-shadow: 0 2px 8px rgba(105,0,184,0.25);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* 5) 마지막 활성 항목은 약간 흐리게 유지 */
+.breadcrumb-item.active {
+  color: #fff !important;
+  opacity: .85;
+  font-weight: 700;
+}
+
+/* ==========================
+   [논문 상세 버튼 통합 디자인]
+   ========================== */
+
+/* 1) 버튼 그룹 정렬 */
+.button-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* 2) 공통 버튼 베이스 */
+.btn-unified {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 12px;
+  padding: 10px 18px;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 10px rgba(105, 0, 184, 0.1);
+  background: #fff;
+  border: 2px solid transparent;
+  letter-spacing: -0.2px;
+}
+
+/* 3) 공통 아이콘 */
+.btn-unified i { font-size: 16px; }
+
+/* 4) 서재 담기 버튼 */
+.btn-save {
+  border-color: #FFD54F;
+  color: #8C6B00;
+  background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+}
+.btn-save:hover {
+  background: linear-gradient(135deg, #FFD54F, #FFC107);
+  color: #3E2E00;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.35);
+  transform: translateY(-2px);
+}
+
+/* 5) 좋아요 버튼 */
+.btn-like {
+  border-color: #be3d3d;
+  background: linear-gradient(135deg, #fff6f6, #ffecec);
+  color: #cf4b4b;
+  font-weight: 700;
+}
+.btn-like:hover {
+  background: linear-gradient(135deg, #ffd6d6, #ffbdbd);
+  color: #b84b4b;
+  border-color: #f5aaaa;
+  box-shadow: 0 4px 12px rgba(217, 48, 48, 0.35);
+  transform: translateY(-2px);
+}
+.btn-like.active {
+  background: linear-gradient(135deg, #e46363, #d93030);
+  color: #fff;
+  border-color: #d33f3f;
+  box-shadow: 0 4px 14px rgba(217, 48, 48, 0.45);
+  transform: translateY(-1px);
+}
+.btn-like i { color: inherit; transition: color 0.2s ease; }
+.btn-like.active i { color: #fff; }
+
+/* 6) PDF 저장 버튼 */
+.btn-pdf {
+  border-color: #D1C4E9;
+  background: #fff;
+  color: #333;
+}
+.btn-pdf:hover {
+  background: #F3E5F5;
+  border-color: #B39DDB;
+  color: #4A148C;
+  box-shadow: 0 4px 12px rgba(105, 0, 184, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 7) 아이콘 크기 */
+.btn-unified i { font-size: 15px; }
+
+/* ====== 국가 상세 - pill & '더보기' 버튼 (기관 상세와 동일 톤) ====== */
+/* ✅ 스코프: .country-info 아래에서만 적용됨 — 논문 목록엔 영향 없음 */
+.country-info .meta-line{
+  display:flex; align-items:center; flex-wrap:wrap; gap:8px;
+  margin-bottom:12px;
+}
+.country-info .meta-label{
+  font-weight:900; font-size:20px; color:rgb(92,91,91);
+  text-shadow:1px 1px 2px gray; white-space:nowrap;
+}
+
+/* pill (키워드/기관/저자 공통) */
+.country-info .keyword-tag{
+  display:inline-block; padding:6px 12px; border-radius:999px;
+  background:#f8f2ff; color:#9b59b6; font-weight:600; font-size:15px;
+  border:1px solid #e4d2ff; text-decoration:none; transition:all .25s ease;
+}
+.country-info .keyword-tag:hover{
+  background:#9b59b6; color:#fff; border-color:#9b59b6;
+  transform:translateY(-1px); box-shadow:0 4px 10px rgba(155,89,182,.25);
+}
+
+/* '더보기' 버튼 */
+.country-info .btn-more{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:10px;
+  background:#fff; border:1px solid #E0D5F4; color:#333;
+  font-weight:700; font-size:13px; transition:all .2s ease;
+}
+.country-info .btn-more:hover{
+  background:#F3E5F5; border-color:#B39DDB; color:#4A148C;
+  box-shadow:0 4px 12px rgba(105,0,184,.15); transform:translateY(-1px);
+}
+
+
+
+
+/* ====== 고정 레이아웃(2 x 2) ====== */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;       /* 2열 */
+  gap: 16px;
+}
+
+/* 반응형(모바일은 1열) */
+@media (max-width: 992px) {
+  .analysis-grid { grid-template-columns: 1fr; }
+}
+
+/* ====== 카드 공통 ====== */
+.qbox {
+  background: #fff;                     /* 내부 흰색 */
+  border: 1px solid #EAE0FF;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(105,0,184,.08);
+}
+
+/* 헤더(보라 그라데이션 바) */
+.qbox-hd{
+  height: 52px;
+  display: flex; align-items: center; justify-content: center; /* ← 가운데 정렬 */
+  padding: 0 16px;
+  font-weight: 800;
+  font-size: 25px;                 /* ← 폰트 키움 */
+  color: #333;                     /* ← 검정 텍스트 */
+  background: #bf8cee;                /* ← 흰 배경 */
+  border-bottom: 1px solid #eee;   /* 보더만 가볍게 */
+  letter-spacing: -0.2px;
+}
+
+/* 본문(고정 높이 컨테이너) */
+:root { --qbox-body-h: 360px; }         /* ▶ 카드 높이: 필요시 320~420px 등으로 조정 */
+.qbox-bd {
+  height: var(--qbox-body-h);
+  padding: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 그래프/워드클라우드가 컨테이너에 딱 맞게 */
+.qbox-bd canvas,
+.qbox-bd svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* 캔버스 가장자리 여백이 답답할 때 살짝 여유 */
+.qbox-bd-inner {
+  width: 100%; height: 100%;
+  padding: 6px 8px 6px 2px;
+}
+
+/* ✅ 탭 버튼 스타일 */
+    /* 기존 Bootstrap nav-link에 새로운 스타일 덮어쓰기 */
+.nav-tabs .nav-link {
+    font-size: 20px;    /* 기본 사이즈 (16px) */
+    border: none;                        /* 기본 테두리 제거 */
+    border-radius: 30px;                 /* 둥글게 (버튼 끝을 라운드로) → 크기 조절 가능 */
+    padding: 20px 150px;                  /* 내부 여백 (세로 10px, 가로 25px) → 크기 조절 핵심 */
+    margin: 0 50px;                       /* 버튼 사이 간격 → 탭 간 간격 */
+    background: #f0f0f5;                 /* 기본 배경색 (연한 회색) */
+    color: #555;                         /* 글자색 (회색 계열) */
+    font-weight: 600;                    /* 글꼴 두께 (bold 아님, 살짝 두껍게) */
+    transition: all 0.3s ease;           /* 애니메이션 (hover 등 변경 시 부드럽게) */
+    position: relative;                 /* 커스텀 요소 삽입 대비 */
+    box-shadow: inset 0 0 0 2px transparent;  /* 내부 그림자 (현재 없음) */
+}
+
+/* 마우스 호버 시 */
+.nav-tabs .nav-link:hover {
+    background: #ba7bee;
+    color: #111;
+}
+
+/* 활성화된 탭 (Bootstrap에서 자동으로 .active 클래스 붙음) */
+.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #6c1bee, #b13bf5);
+    color: white;
+    box-shadow: 0 4px 14px rgba(123, 47, 247, 0.3);
+}
+
+/* 탭 바 자체 꾸미기 */
+.nav-tabs {
+    border: none !important;
+    background: #f9f9fc;
+    padding: 8px 12px;
+    border-radius: 50px;
+    display: inline-flex;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== 공동관계 네트워크 전용 스타일 (저자/기관 공통) ===== */
+#instNetworkChart{
+  width:100%; height:100%;
+  background:#FAFBFE;        /* 아주 옅은 미색 */
+  border-radius:12px; display:block;
+}
+#instNetworkChart, #instNetworkChart *{
+  user-select:none; -webkit-user-drag:none;
+}
+/* 툴팁 */
+.nc-tooltip{
+  position:absolute; pointer-events:none;
+  background:rgba(33,33,33,.96); color:#fff;
+  padding:8px 10px; border-radius:8px; font-size:12px; line-height:1.4;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+  transform:translate(-50%, calc(-100% - 10px));
+  white-space:nowrap; z-index:9999;
+}
+/* 호버 강화 */
+#instNetworkChart .node-hover circle { filter: drop-shadow(0 6px 10px rgba(105,0,184,.25)); }
+#instNetworkChart .link-hover { stroke:#333 !important; }
+#instNetworkChart .orbit { stroke:#E9E2FF; stroke-width:1.2; fill:none; }

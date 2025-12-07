@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'css/analysis.css' %}?v=1">
+
+<!-- 분석 페이지 컨텐츠 -->
+<div class="container mt-5 pt-5">
+    <div class="title-spacer mb-4"></div>
+
+    <!-- ✅ 선택된 연도 표시 -->
+    <h5 class="text-center" style="color: #5498e6; margin-top:30px;">
+        현재 선택된 연도: <span id="selected-year" style="color: #5498e6;">2025</span>
+    </h5>
+    
+    <!-- 연도 선택 버튼 -->
+    <div class="text-center mb-4">
+        {% for year in years %}
+            <button class="btn btn-outline-primary year-btn mx-2 {% if year == 2025 %}active{% endif %}" 
+                    data-year="{{ year }}">{{ year }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        <!-- 🏆 연구분야 순위 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <!-- 🟣 연구분야 순위 -->
+                <div class="card-header bg-primary text-white">
+                  <h4 class="mb-0">연구분야(Top 10)</h4>
+                </div>
+                <div class="card-body">
+                    <ul id="part-ranking" class="list-group">
+                        <li class="list-group-item text-muted">데이터 로딩 중...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔑 키워드 순위 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <!-- 🟣 키워드 순위 -->
+                <div class="card-header bg-success text-white">
+                  <h4 class="mb-0">키워드(Top 10)</h4>
+                </div>
+                <div class="card-body">
+                    <ul id="keyword-ranking" class="list-group">
+                        <li class="list-group-item text-muted">데이터 로딩 중...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+
+<!-- ✅ 여기부터: 워드클라우드 '위쪽'에 막대그래프 2개 추가 -->
+<div class="container mt-4">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">연도별 연구분야</h5>
+        </div>
+        <div class="card-body" style="min-height:auto;">
+          <canvas id="partChart" height="180"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">연도별 키워드</h5>
+        </div>
+        <div class="card-body" style="min-height:auto;">
+          <canvas id="keywordChart" height="180"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ✅ 여기까지가 막대그래프 영역 -->
+<hr>
+<div class="container mt-4 mb-5">
+    <!-- 연도 및 연구분야 선택 -->
+    <div class="row mb-3 text-center">
+        <div class="col-md-6">
+            <label for="year-select" class="fw-bold">연도</label>
+            <select id="year-select" class="form-select">
+                <option value="">전체</option>
+                {% for year in years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="part-select" class="fw-bold">연구분야</label>
+            <select id="part-select" class="form-select">
+                <option value="">전체</option>
+                {% for part in main_parts %}
+                    <option value="{{ part.id }}">{{ part.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- 시각화 + 정성적 분석 -->
+    <div class="row">
+        <!-- ✅ 좌측: 워드 클라우드 -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-center align-items-center" style="height: 400px;">
+                    <svg id="wordcloud-svg" width="100%" height="100%"></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ 우측: 정성적 분석 -->
+        <!-- 정성적 분석 박스 -->
+        <div class="col-md-6 col-lg-6 mb-4">
+            <div class="border border-primary rounded p-3 analysis-box" style="height: 450px; overflow-y: auto;">
+                <!-- ✅ 버튼을 가운데 정렬하기 위한 flex 컨테이너 -->
+                <div class="d-flex justify-content-center mb-2">
+                    <button id="analysisToggle"
+                            class="btn"
+                            style="background-color: #a177db; color: white; font-size: 1.1rem; padding: 10px 20px; border: none;">
+                        정성적 분석 보기
+                    </button>
+                </div>
+        
+                <div id="analysisContent" style="display: none; padding-top: 15px;">
+                    <div id="loadingMessage" style="display: none; text-align: center;">
+                        <p>📊 분석 중입니다. 잠시만 기다려 주세요...</p>
+                    </div>
+                    <div id="analysisResult" class="p-3" style="border: 1px solid #ccc; background-color: #f9f9f9; border-radius: 5px; max-height: 340px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ JavaScript 수정 -->
+<!-- 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ===== 기본 엘리먼트
+  const yearButtons = document.querySelectorAll('.year-btn');
+  const selectedYearText = document.getElementById('selected-year');
+
+  // ===== 차트 인스턴스
+  let partChartInstance = null;
+  let keywordChartInstance = null;
+
+  // ✅ 최초 높이(px) 고정용 캐시
+  const chartFixedSize = {};
+
+  // ===== 라우트 상수 (링크 생성용)
+  const PART_PAGE_URL = '/part_paper/';
+  const KEYWORD_DETAIL_BASE = '/keyword/';
+
+  // ===== 초기 연도: 활성 버튼이 있으면 그 연도, 없으면 2025
+  const activeBtn = document.querySelector('.year-btn.active');
+  const defaultYear = activeBtn ? activeBtn.dataset.year : '2025';
+  selectedYearText.textContent = defaultYear;
+  fetchRankings(defaultYear);
+
+  // 연도 버튼 클릭 처리
+  yearButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const year = btn.dataset.year;
+      selectedYearText.textContent = year;
+      yearButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      fetchRankings(year);
+    });
+  });
+
+  // ===== 랭킹 + 차트
+  function fetchRankings(year) {
+    fetch(`/get_rankings/${year}/`)
+      .then(res => res.json())
+      .then(data => {
+        updateRankings(data.part_rankings, 'part-ranking');
+        updateRankings(data.keyword_rankings, 'keyword-ranking');
+        renderBarChart('partChart', data.part_rankings, '연구분야',   '#2E86AB', chart => partChartInstance = chart, partChartInstance); // 파란색
+        renderBarChart('keywordChart', data.keyword_rankings, '키워드', '#F6A01A', chart => keywordChartInstance = chart, keywordChartInstance); // 오렌지
+      })
+      .catch(err => console.error('랭킹 로드 오류:', err));
+  }
+
+  function updateRankings(rankings, elementId) {
+    const ul = document.getElementById(elementId);
+    ul.innerHTML = '';
+    if (!rankings?.length) {
+      ul.innerHTML = '<li class="list-group-item text-muted text-center">데이터 없음</li>';
+      return;
+    }
+    rankings.forEach((row, i) => {
+      const isArr = Array.isArray(row);
+      const id    = isArr ? null   : row.id;
+      const name  = isArr ? row[0] : row.name;
+      const count = isArr ? row[1] : row.count;
+
+      const li = document.createElement('li');
+      li.className = 'list-group-item rank-item';
+
+      const left = document.createElement('span');
+      left.className = 'rank-left';
+      left.innerHTML = `<strong>${i + 1}위</strong>`;
+
+      const center = document.createElement('div');
+      center.className = 'rank-center';
+      const link = document.createElement('a');
+      link.className = 'rank-link fw-semibold';
+      link.textContent = name;
+      if (elementId === 'part-ranking') {
+        const url = new URL(PART_PAGE_URL, window.location.origin);
+        if (id) url.searchParams.set('part_id', id);
+        url.searchParams.set('part_name', name);
+        url.searchParams.set('page', '1');
+        link.href = url.toString();
+      } else {
+        link.href = `${KEYWORD_DETAIL_BASE}${id ?? ''}/`;
+      }
+      center.appendChild(link);
+
+      const right = document.createElement('span');
+      right.className = 'badge bg-primary rank-right';
+      right.textContent = `${count}개`;
+
+      li.append(left, center, right);
+      ul.appendChild(li);
+    });
+  }
+
+  function renderBarChart(canvasId, rows, label, color, setInstance, prev) {
+    const labels = rows.map(r => Array.isArray(r) ? r[0] : r.name);
+    const values = rows.map(r => Array.isArray(r) ? r[1] : r.count);
+
+    // 이전 차트 제거하되, 캔버스 높이(style)는 유지
+    if (prev) prev.destroy();
+
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+
+    // ✅ 최초 한 번만 실제 렌더 높이를 기록하고, 이후에도 고정
+    if (!chartFixedSize[canvasId]) {
+      // 우선순위: style.height → clientHeight → height 속성 → 260
+      const initialH =
+        parseInt(canvas.style.height) ||
+        canvas.clientHeight ||
+        parseInt(canvas.getAttribute('height')) || 260;
+
+      chartFixedSize[canvasId] = initialH;
+      canvas.style.height = initialH + 'px';   // ✅ 이후 재렌더에도 유지
+    }
+
+    const fill  = color + '55';
+    const hover = color + '99';
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: `${label} 횟수`,
+          data: values,
+          backgroundColor: fill,
+          borderColor: color,
+          borderWidth: 1,
+          hoverBackgroundColor: hover,
+          hoverBorderColor: color
+        }]
+      },
+      options: {
+        // ✅ 반응형은 유지하되, 높이는 우리가 고정해둔 style.height를 따르도록
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false }},
+        scales: {
+          x: { ticks: { autoSkip: false, maxRotation: 45 }, grid: { display: false }},
+          y: { beginAtZero: true, title: { display: true, text: '건수' } }
+        }
+      }
+    });
+
+    // ✅ 생성 직후에도 혹시 모를 재계산 대비: 높이 강제 유지
+    chart.resize(undefined, chartFixedSize[canvasId]);
+
+    setInstance(chart);
+  }
+
+
+  // ===== 워드클라우드 (연/연구분야파트 선택과 연동)
+  const yearSelect = document.getElementById('year-select');
+  const partSelect = document.getElementById('part-select');
+  const wcSvg = d3.select('#wordcloud-svg');
+
+  function fetchWordCloud() {
+    const params = new URLSearchParams();
+    if (yearSelect.value) params.append('year', yearSelect.value);
+    if (partSelect.value) params.append('part_id', partSelect.value);
+    fetch(`/get_wordcloud_data/?${params.toString()}`)
+      .then(res => res.json())
+      .then(data => updateWordCloud(data.keywords))
+      .catch(err => console.error('워드클라우드 오류:', err));
+  }
+
+  function updateWordCloud(words) {
+    const width = wcSvg.node().clientWidth || 600;
+    const height = 400;
+    const fontScale = d3.scaleLinear()
+      .domain([d3.min(words, d => d.size), d3.max(words, d => d.size)])
+      .range([23, 80]);
+
+    wcSvg.selectAll('*').remove();
+    d3.layout.cloud()
+      .size([width, height])
+      .words(words)
+      .padding(5)
+      .rotate(() => Math.random() * 30 - 15)
+      .fontSize(d => fontScale(d.size))
+      .on('end', (w) => {
+        wcSvg.append('g')
+          .attr('transform', `translate(${width/2},${height/2})`)
+          .selectAll('text')
+          .data(w).enter().append('text')
+          .style('font-size', d => `${d.size}px`)
+          .style('fill', (d, i) => d3.schemeCategory10[i % 10])
+          .attr('text-anchor', 'middle')
+          .attr('transform', d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+          .text(d => d.text)
+          .style('cursor', 'pointer')
+          .on('click', (_, d) => {
+            fetch(`/get_keyword_id/?name=${encodeURIComponent(d.text)}`)
+              .then(r => r.json())
+              .then(j => j.keyword_id ? (window.location.href = `/keyword/${j.keyword_id}/`) :
+                    alert('해당 키워드 페이지를 찾을 수 없습니다.'))
+              .catch(e => console.error('키워드 ID 조회 실패:', e));
+          });
+      })
+      .start();
+  }
+
+  yearSelect?.addEventListener('change', fetchWordCloud);
+  partSelect?.addEventListener('change', fetchWordCloud);
+  fetchWordCloud();
+
+  // ===== 정성적 분석 토글
+  const analysisButton  = document.getElementById('analysisToggle');
+  const analysisContent = document.getElementById('analysisContent');
+  const analysisResult  = document.getElementById('analysisResult');
+  const loadingMessage  = document.getElementById('loadingMessage');
+
+  analysisButton?.addEventListener('click', () => {
+    const open = analysisContent.style.display !== 'none';
+    analysisContent.style.display = open ? 'none' : 'block';
+    analysisButton.textContent = open ? '분석 보기' : '분석 숨기기';
+    if (!open && !analysisResult.innerHTML.trim()) fetchOllamaAnalysis();
+  });
+
+  function fetchOllamaAnalysis() {
+    const y = yearSelect.value;
+    const p = partSelect.value;
+    if (!y || !p) { alert('⚠️ 연도와 연구분야를 선택해주세요.'); return; }
+
+    loadingMessage.style.display = 'block';
+    fetch(`/api/analyze_wordcloud/?year=${y}&part_id=${p}`)
+      .then(r => r.json())
+      .then(j => {
+        loadingMessage.style.display = 'none';
+        analysisResult.innerHTML = j.analysis
+          ? `<p>${j.analysis}</p>`
+          : "<p style='color:red;'>❌ 분석 결과를 가져올 수 없습니다.</p>";
+      })
+      .catch(err => {
+        loadingMessage.style.display = 'none';
+        console.error('정성적 분석 오류:', err);
+        analysisResult.innerHTML = "<p style='color:red;'>⚠️ 분석 요청에 실패했습니다.</p>";
+      });
+  }
+});
+</script>
+
+{% endblock %}

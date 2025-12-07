@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}ITRT | IT Research Trends 소개{% endblock %}
+{% block contents %}
+<style>
+  :root{
+    --primary:#6900B8;       /* 브랜드 보라 */
+    --primary-600:#5a00a0;
+    --primary-50:#F6F1FF;
+    --ink-900:#0f172a;
+    --ink-700:#334155;
+    --ink-600:#475569;
+    --ink-500:#64748b;
+    --line:#E5E7EB;
+    --surface:#f8fafc;
+    --radius:14px;
+    --radius-sm:10px;
+    --shadow:0 10px 24px rgba(2,6,23,.06), 0 2px 6px rgba(2,6,23,.04);
+  }
+  main { width: 100%; padding-top: 100px; }
+  .container-intro { display:flex; flex-direction:column; align-items:center; max-width: 900px; margin:auto; padding: 28px 20px; }
+  .brand { display:flex; align-items:center; gap:10px; margin-top:6px; margin-bottom:10px; }
+  .brand-badge { width:40px; height:40px; border-radius:12px; background:#6900B8; color:#fff; display:grid; place-items:center; font-weight:800; letter-spacing:.5px; }
+  h1 { font-size: 2.4em; color: #2b2b2b; margin: 0 0 10px; line-height: 1.2; text-align: center; }
+  .subtitle { font-size: 1.05em; color:#6b7280; text-align:center; margin-bottom: 22px; }
+  .intro-text { font-size: 1.14em; line-height: 1.75; color: #4a5568; margin-bottom: 28px; max-width: 780px; text-align: center; }
+  
+  
+  .chip-row { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom: 26px; }
+  .chip { font-weight:700; background:#F6F1FF; color:#6900B8; border:1px solid #E7DFFF; border-radius:999px; padding:.35rem .7rem; font-size:.9em; }
+  /* 섹션 */
+  .section{max-width:1024px;width:100%;margin-top:28px}
+  .section-kicker{font-size:.88rem;font-weight:800;color:var(--primary);letter-spacing:.35px;margin-bottom:2px}
+  .section-title{font-size:1.22rem;color:var(--ink-900);font-weight:900;margin:10px 0 10px}
+  .section-content{padding:16px 18px;background:var(--surface);border-radius:var(--radius-sm);margin-bottom:16px;line-height:1.7;color:var(--ink-700);border:1px solid #eef2f7}
+
+  /* 카드 그리드 */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(2,6,23,.08), 0 4px 10px rgba(2,6,23,.06)}
+  .card h5{font-size:1.02rem;font-weight:900;color:var(--ink-900);margin:0 0 6px}
+  .small{font-size:.95rem;color:var(--ink-600)}
+
+  .bullets{padding-left:18px;margin:0}
+  .bullets li{margin:6px 0}
+
+  /* 통계 바 (옵션) */
+  .stat{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800}
+  .bar{height:10px;background:#EEE9FB;border-radius:999px;overflow:hidden}
+  .bar>span{display:block;height:100%;background:var(--primary)}
+
+  /* 푸터 문의 */
+  .contact{border:1px dashed #e5e7eb;background:#fff}
+
+  /* 포커스/접근성 */
+  .chip, .card, a{outline:none}
+  .chip:focus, .card:focus-within, a:focus{box-shadow:0 0 0 3px rgba(105,0,184,.25)}
+
+  /* 반응형 */
+  @media (max-width: 992px){.grid-2{grid-template-columns:1fr}}
+  @media (max-width: 768px){.intro-text{font-size:1rem}.section-title{font-size:1.12rem}.section-content{font-size:1rem;padding:12px 14px}}
+</style>
+
+<div class="container-intro" style="margin-top:150px;">
+  <!-- 브랜드 헤더 (이전 디자인 그대로) -->
+  <div class="brand" aria-label="brand">
+    <div class="brand-badge">IT</div>
+    <div>
+      <h1>ITRT <span class="muted" style="font-weight:700">| IT Research Trends</span></h1>
+      <div class="subtitle">국제 저명학술지 기반의 <b>IT 연구 동향</b>을 한눈에 — 검색 · 분석 · 시각화까지</div>
+    </div>
+  </div>
+    <p class="intro-text">
+      ITRT는 논문 메타데이터와 키워드를 정제·가공하여 <b>연구 주제의 흐름</b>, <b>주요 키워드</b>,
+      <b>핵심 저자·기관·국가</b>를 빠르게 파악하도록 돕는 <b>연구 동향 분석</b> 플랫폼입니다.
+      Django + MariaDB 기반 서버, Ajax 부분 렌더링, 워드클라우드/네트워크 시각화 등 <b>실서비스급 UX</b>를 목표로 합니다.
+    </p>
+
+    <div class="chip-row">
+      <span class="chip">🔍 통합 검색</span>
+      <span class="chip">☁️ 워드클라우드</span>
+      <span class="chip">🕸 네트워크 시각화</span>
+      <span class="chip"> AI 요약 </span>
+    </div>
+  </section>
+
+  <!-- 기대 효과 -->
+  <section class="section">
+    <div class="section-kicker">Benefits</div>
+    <h2 class="section-title">연구 효율성 증대</h2>
+    <div class="section-content">
+      최신 동향, 핵심 키워드, 연구자/기관/국가 간 협력 관계를 신속 파악하여 주제 선정·협업 탐색에 도움을 줍니다.
+    </div>
+
+    <h2 class="section-title">연구 질적 향상</h2>
+    <div class="section-content">
+      키워드 및 네트워크 시각화로 인접 분야 트렌드까지 확인, 다학제적 접근을 촉진합니다.
+    </div>
+
+    <h2 class="section-title">실시간 정보 접근성</h2>
+    <div class="section-content">
+      관심 키워드와 연계된 최신 소식을 맥락과 함께 파악, 연구를 사회적 요구와 밀접하게 연결합니다.
+    </div>
+
+    <h2 class="section-title">교육/학습 자료</h2>
+    <div class="section-content">
+      대학·연구기관에서 최신 동향 학습과 방법론 교육 자료로 활용할 수 있습니다.
+    </div>
+
+    <h2 class="section-title">정책/투자 의사결정</h2>
+    <div class="section-content">
+      산업·정부의 전략 수립과 R&D 투자 판단에 참고 자료로 사용할 수 있습니다.
+    </div>
+  </section>
+
+  <!-- 핵심 기능 -->
+  <section class="section">
+    <div class="section-kicker">Features</div>
+    <h2 class="section-title">핵심 기능</h2>
+    <div class="section-content">
+      <div class="grid-2">
+        <article class="card" tabindex="0">
+          <h5>1) 통합 검색 & 정렬</h5>
+          <p class="small">제목/초록/키워드/저자/기관/국가 필드 검색, 다단 AND 조건, 정렬/페이지네이션 지원</p>
+        </article>
+        <article class="card" tabindex="0">
+          <h5>2) 추천 키워드 & 워드클라우드</h5>
+          <p class="small">TF-IDF + 인용수 가중, 상위 N을 워드클라우드로 시각화하여 탐색 가속</p>
+        </article>
+        <article class="card" tabindex="0">
+          <h5>3) 임베딩 기반 유사도</h5>
+          <p class="small">BERT 임베딩 코사인 유사도로 유사 논문 추천 (규칙 기반 필터 병행)</p>
+        </article>
+        <article class="card" tabindex="0">
+          <h5>4) Ajax 부분 렌더링</h5>
+          <p class="small">필터/정렬/페이지 이동 시 필요한 영역만 갱신하여 반응성 향상</p>
+        </article>
+        <article class="card" tabindex="0">
+          <h5>5) 저장 · 좋아요</h5>
+          <p class="small">로그인 세션 연동, 관심 논문/저자/기관/국가 저장 및 마이페이지 연계</p>
+        </article>
+        <article class="card" tabindex="0">
+          <h5>6) 마이페이지 필터</h5>
+          <p class="small">좋아요 기반 주요 키워드·저자·기관 추천 (중복 제거, 상위 5~8개)</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 사용 방법 -->
+  <section class="section">
+    <div class="section-kicker">How to Use</div>
+    <h2 class="section-title">빠른 시작</h2>
+    <div class="section-content">
+      <ol class="mb-0" style="padding-left:18px">
+        <li>상단 검색창에 키워드를 입력합니다. (예: "Computer Vision", "Federated Learning")</li>
+        <li>좌측 필터에서 저자/기관/국가/연도/분야를 선택해 결과를 정교화합니다.</li>
+        <li>정렬 옵션(관련도, 인용수, 최신순)을 바꿔 보며 탐색합니다.</li>
+        <li>워드클라우드에서 관심 키워드를 선택해 인접 주제를 확장합니다.</li>
+        <li>관심 논문은 저장/좋아요 후 마이페이지에서 확인합니다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 문의 -->
+  <section class="section" id="contact">
+    <div class="section-kicker">Contact</div>
+    <h2 class="section-title">문의하기</h2>
+    <div class="section-content contact">
+      ITRT에 대한 제안/버그 리포트/협업 문의는 <b>마이페이지 &gt; 문의</b> 또는 저장소 이슈 트래커를 이용해 주세요.<br>
+      <span class="small">※ 본 서비스는 포트폴리오/연구 목적의 데모로 시작하여 점진적 확장을 진행 중입니다.</span>
+    </div>
+  </section>
+</div>
+{% endblock %}

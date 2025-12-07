@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+
+<!-- 논문 상세 페이지 전용 CSS -->
+<link rel="stylesheet" href="{% static 'css/paper.css' %}">
+
+<!-- 1) 상단 페이지 헤더 영역 -->
+<div class="container-fluid page-header hero-compact" 
+     style="
+       position: relative;
+       background: linear-gradient(135deg, rgba(13, 13, 14, 0.85) 0%, rgba(172, 125, 233, 0.75) 100%);
+       color: #fff;
+       overflow: hidden;
+       border-bottom: 1px solid rgba(255,255,255,0.2);
+     ">
+
+  <!-- 헤더 배경 블러 오버레이 -->
+  <div style="position:absolute; inset:0; backdrop-filter: blur(8px); background: rgba(255,255,255,0.05);"></div>
+
+  <!-- 헤더 내부 컨테이너 -->
+  <div class="container position-relative text-center" style="z-index:2;">
+    <!-- 페이지 타이틀 (논문 제목) -->
+    <h1 class="display-6 fw-bold mb-3 page-title" 
+        style="color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,0.25); letter-spacing:-0.3px;">
+      {{ paper.title }}
+    </h1>
+
+    <!-- breadcrumb 경로 표시 -->
+    <div class="d-inline-block mt-2 crumb-card"     
+         style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+                border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); backdrop-filter: blur(10px);">
+      <ol class="breadcrumb mb-0" style="background: transparent; font-weight:600; letter-spacing:-0.2px; margin:0;">
+        <li class="breadcrumb-item">
+          <a href="{% url 'main' %}" class="crumb-link">Home</a>   
+        </li>
+        <li class="breadcrumb-item">
+          <a href="javascript:history.back()" class="crumb-link">search page</a>  
+        </li>
+        <li class="breadcrumb-item active">paper</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- 2) 본문 전체 컨테이너 -->
+<div class="container-fluid py-2 mt-2">
+  <div class="container py-5">
+    <div class="row g-4 mb-5">
+
+      <!-- 3) 왼쪽 영역: 논문 상세 본문 -->
+      <div class="col-lg-8 col-xl-9">
+        <div class="row g-4">
+
+          <!-- 4) 논문 기본 정보 (제목, 분야, 키워드, 학회, 초록, 버튼) -->
+          <div class="col-lg-12 text-start">
+            <!-- 논문 제목 (본문 내) -->
+            <h3 class="fw-bold mb-3" style="font-size: 28px; color: #333;">
+              {{ paper.title }}
+            </h3>
+            <hr class="my-3">
+
+            <!-- 논문 연구 분야(파트) -->
+            <p class="mb-3">
+              <span style="font-weight: 900; font-size: 20px; color: rgb(92, 91, 91); text-shadow: 1px 1px 2px gray;">
+                연구 분야:
+              </span>
+              <span style="font-size: 18px;">{{ parts|join:", " }}</span>
+            </p>
+            <hr class="my-3">
+
+            <!-- 논문 키워드 영역 -->
+            <div class="keyword-container mb-3">
+              <span class="keyword-label">논문 키워드:</span>
+              {% for keyword in keywords %}
+                <a href="{% url 'keyword_page' keyword.id %}" class="keyword-tag">
+                  #{{ keyword.keyword_name }}
+                </a>
+              {% empty %}
+                <span class="text-muted">등록된 키워드 없음</span>
+              {% endfor %}
+            </div>
+            <hr class="my-3">
+
+            <!-- 학회/저널 정보 -->
+            <p class="mb-3">
+              <span style="font-weight: 900; font-size: 20px; color: rgb(92, 91, 91); text-shadow: 1px 1px 2px gray;">
+                학회:
+              </span>
+              <span style="font-size: 18px;">{{ paper.published_in }}</span>
+            </p>
+            <hr class="my-3">
+
+            <!-- 초록(abstract) 영역 -->
+            <span style="font-weight: 900; font-size: 20px; color: rgb(92, 91, 91); text-shadow: 1px 1px 2px gray;">
+              초록
+            </span>
+            <p class="mb-4" style="font-size: 18px;">{{ paper.abstract }}</p>
+            <hr class="my-3">
+            
+            <!-- 내 서재 / 좋아요 / PDF 저장 버튼 그룹 -->
+            <div class="button-group">
+              <!-- 내 서재 담기 -->
+              <button id="save-paper-btn" class="btn-unified btn-save">
+                <i class="far fa-bookmark"></i> 내 서재 담기
+              </button>
+
+              <!-- 좋아요 토글 -->
+              <button class="btn-unified btn-like {% if user_liked %}active{% endif %} like-paper"
+                      data-paper-id="{{ paper.id }}">
+                <i class="fas fa-heart"></i>
+                좋아요 (<span id="like-count-{{ paper.id }}">{{ like_count }}</span>)
+              </button>
+
+              <!-- PDF 저장 -->
+              <button class="btn-unified btn-pdf" id="pdfDownload">
+                <i class="fas fa-file-pdf"></i> PDF 저장
+              </button>
+            </div>
+          </div>
+          
+          <!-- 5) 저자 리스트 영역 (첫 3명 + 더보기) -->
+          <div id="authorList">
+
+            <!-- 5-1) 상위 3명 저자 카드 -->
+            <div class="author-list" id="authorListPrimary">
+              {% for author in authors|slice:":3" %}
+                <div class="author-card">
+                  <img src="{% static 'img/avatar.jpg' %}" alt="Author Profile" class="author-avatar">
+                  <div class="author-body">
+                    <h6 class="author-name">
+                      <a href="{% url 'author_page' author.id %}">{{ author.name }}</a>
+                    </h6>
+                    <p class="author-affiliation">{{ author.affiliation }}</p>
+                    <span class="author-country">
+                      <span class="dot"></span>{{ author.country }}
+                    </span>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-muted">등록된 저자 정보가 없습니다.</p>
+              {% endfor %}
+            </div>
+
+            {% if authors|length > 3 %}
+              <!-- 5-2) 나머지 저자 카드 (기본 숨김) -->
+              <div class="author-list" id="authorListMore" style="display:none;">
+                {% for author in authors|slice:"3:" %}
+                  <div class="author-card">
+                    <img src="{% static 'img/avatar.jpg' %}" alt="Author Profile" class="author-avatar">
+                    <div class="author-body">
+                      <h6 class="author-name">
+                        <a href="{% url 'author_page' author.id %}">{{ author.name }}</a>
+                      </h6>
+                      <p class="author-affiliation">{{ author.affiliation }}</p>
+                      <span class="author-country">
+                        <span class="dot"></span>{{ author.country }}
+                      </span>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <!-- 5-3) 저자 더보기/접기 버튼 -->
+              <div class="more-wrap">
+                <button id="toggleAuthors"
+                        class="btn-unified btn-more"
+                        aria-expanded="false"
+                        aria-controls="authorListMore">
+                  <i class="fas fa-chevron-down chevron" aria-hidden="true"></i>
+                  <span class="label">더보기</span>
+                  <span class="count-badge">+{{ authors|length|add:"-3" }}</span>
+                </button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 6) 오른쪽 영역: 논문 요약 정보 테이블 -->
+      <div class="col-lg-4 col-xl-3 order-lg-last">
+        <div class="row g-4 fruite">
+          <div class="col-lg-12">
+            <div class="mb-4">
+              <h4 class="fw-bold mb-4" style="color:#333;">📄 논문 정보</h4>
+              <table class="custom-table">
+                <tbody>
+                  <tr>
+                    <th>발행 연도</th>
+                    <td>{{ paper.year }}년</td>
+                  </tr>
+                  <tr>
+                    <th>인용수</th>
+                    <td>{{ paper.citation }}</td>
+                  </tr>
+                  <tr>
+                    <th>출판 국가</th>
+                    <td>{{ country|join:", " }}</td>
+                  </tr>
+                  <tr>
+                    <th>사이트</th>
+                    <td>{{ paper.site }}</td>
+                  </tr>
+                  <tr>
+                    <th>좋아요 수</th>
+                    <td><span id="total-likes">{{ like_count|default:"0" }}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>                    
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 7) 연관 논문 목록 영역 -->
+    <div class="container mt-5">
+      <h3 class="mb-3 text-start d-flex align-items-center">
+        <i class="fas fa-file-alt"></i> 연관 논문 목록 
+        <span class="text-muted small ms-2">({{ page_obj.paginator.count }}건)</span>
+
+        <!-- 선택 논문 내 서재 담기 -->
+        <button class="btn btn-outline-dark ms-auto save-selected-papers">
+          <i class="far fa-bookmark"></i> 내 서재 담기
+        </button>
+      </h3>
+      <hr class="my-3">
+
+      <!-- 연관 논문 카드 리스트 -->
+      <div class="related-list">
+        {% if page_obj %}
+          {% for paper in page_obj %}
+          <div class="paper-card">
+            <!-- 체크박스 -->
+            <div class="check-col">
+              <input type="checkbox"
+                     class="form-check-input selected-paper"
+                     name="selected_papers"
+                     value="{{ paper.id }}"
+                     data-paper-id="{{ paper.id }}">
+            </div>
+
+            <!-- 카드 본문: 제목/저자/키워드/파트/연도 -->
+            <div class="body-col">
+              <!-- 제목 -->
+              <h5 class="paper-title">
+                <a href="{% url 'paper_page' paper_id=paper.id %}">
+                  {{ paper.title }}
+                </a>
+              </h5>
+
+              <!-- 저자 목록 -->
+              <div class="meta-line meta-authors">
+                <span class="meta-label">저자:</span>
+                {% for pa in paper.author_papers.all %}
+                  <a href="{% url 'author_page' author_id=pa.author_id.id %}" class="text-primary">
+                    {{ pa.author_id.name }}
+                  </a>{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  <span class="text-muted">저자 없음</span>
+                {% endfor %}
+              </div>
+
+              <!-- 키워드 목록 -->
+              <div class="meta-line meta-keywords">
+                <span class="meta-label">키워드:</span>
+                {% for pk in paper.keyword_papers.all %}
+                  <span class="tag">#{{ pk.keyword_id.keyword_name }}</span>
+                {% empty %}
+                  <span class="text-muted">키워드 없음</span>
+                {% endfor %}
+              </div>
+
+              <!-- 파트 / 연도 -->
+              <div class="meta-line meta-partyear">
+                <span class="meta-label">파트:</span>
+                {% for pp in paper.part_papers.all %}
+                  {{ pp.part_id.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  <span class="text-muted">파트 없음</span>
+                {% endfor %}
+                <span class="sep">|</span>
+                <span class="meta-label">연도:</span>
+                <span>{{ paper.year|default:"연도 없음" }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+          <!-- 페이지네이션 컨테이너 (JS 동적 생성) -->
+          <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <div id="paginationControls" class="mt-4"></div>
+              </ul>
+            </nav>
+          </div>
+        {% else %}
+          <p class="text-start text-muted">연관 논문이 없습니다.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 PDF 관련 라이브러리 로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Django 값 → JS 전역 변수로 전달 -->
+<script>
+  window.paperId      = "{{ paper.id }}";
+  window.contentType  = "{{ content_type }}";
+  window.objectId     = "{{ object_id }}";
+  window.objectTitle  = "{{ page_title }}";
+  window.csrfToken    = "{{ csrf_token }}";
+
+  window.currentPage = Number("{{ page_obj.number }}");
+  window.totalPages  = Number("{{ page_obj.paginator.num_pages }}");
+</script>
+
+<!-- 분리된 JS 파일 로드 -->
+<script src="{% static 'js/paper.js' %}"></script>
+
+{% endblock %}

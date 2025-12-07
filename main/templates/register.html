@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #9f88f1, #5fb2e9);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-login {
+            font-size: 0.9rem;
+            letter-spacing: 0.05rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .btn-google {
+            color: white !important;
+            background-color: #ea4335;
+        }
+
+        .btn-facebook {
+            color: white !important;
+            background-color: #3b5998;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5 col-md-6 col-sm-12 mx-auto">
+                <div class="card my-5 border-0 shadow rounded-3" style="max-width: 500px;">
+                    <div class="card-body p-4 p-sm-4">
+                        <!-- ITRT 로고 -->
+                        <div class="text-center mb-3">
+                            <a href="{% url 'main' %}" class="navbar-brand">
+                                <h1 class="display-4 fw-bold" style="color: #6900B8;">ITRT</h1>
+                            </a>
+                        </div>
+    
+                        <form id="registerForm">
+    
+                            <div class="input-group mb-2">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="user_name" placeholder="myusername" required>
+                                    <label for="user_name">User ID</label>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm px-2" type="button" id="check_username">중복 확인</button>
+                            </div>
+                            <small id="usernameMessage" class="text-muted"></small>                            
+                            
+    
+                            <div class="form-floating mb-2">
+                                <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                                <label for="email">Email address</label>
+                            </div>
+    
+                            <div class="form-floating mb-2">
+                                <input type="password" class="form-control" id="password" placeholder="Password" required>
+                                <label for="password">Password</label>
+                            </div>
+    
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="confirm_password" placeholder="Confirm Password" required>
+                                <label for="confirm_password">Password Confirmation</label>
+                            </div>
+    
+                            <div class="d-grid mb-2">
+                                <button class="btn btn-lg btn-primary btn-login fw-bold text-uppercase" type="submit"> 가입 </button>
+                            </div>
+    
+                            <a class="d-block text-center mt-2 small text-primary" href="/login">이미 계정이 있나요? 로그인</a>
+    
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+<!-- JavaScript -->
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const user_name = document.getElementById('user_name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirm_password = document.getElementById('confirm_password').value;
+
+        if (password !== confirm_password) {
+            alert('비밀번호가 일치하지 않습니다!');
+            return;
+        }
+
+        // CSRF 토큰 가져오기
+        const csrfToken = getCookie('csrftoken');
+
+        try {
+            const response = await fetch('/register_user/', {  // URL 확인 (register → register_user)
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ user_name, email, password, confirm_password })
+            });
+
+            const result = await response.json();
+
+            if (response.status === 201) {
+                alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+                window.location.href = '/login/';  // 로그인 페이지로 리디렉션
+            } else {
+                alert(`회원가입 실패: ${result.error}`);
+            }
+        } catch (error) {
+            alert(`회원가입 요청 실패: ${error.message}`);
+        }
+    });
+
+    // CSRF 토큰 가져오는 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<script>
+    document.getElementById('check_username').addEventListener('click', async function () {
+        const user_name = document.getElementById('user_name').value;
+        const usernameMessage = document.getElementById('usernameMessage');
+
+        if (!user_name) {
+            usernameMessage.innerHTML = '<span class="text-danger">사용자 ID를 입력해주세요.</span>';
+            return;
+        }
+
+        try {
+            const response = await fetch('/check_username/?user_name=' + encodeURIComponent(user_name));
+            const result = await response.json();
+
+            if (response.status === 200) {
+                usernameMessage.innerHTML = '<span class="text-success">사용 가능한 ID입니다.</span>';
+            } else {
+                usernameMessage.innerHTML = '<span class="text-danger">' + result.error + '</span>';
+            }
+        } catch (error) {
+            usernameMessage.innerHTML = '<span class="text-danger">중복 확인 중 오류 발생</span>';
+        }
+    });
+</script>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

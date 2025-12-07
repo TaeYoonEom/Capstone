@@ -1,0 +1,108 @@
+:root{
+  --itrt-purple:#6900B8; --itrt-purple-600:#7a2ae0;
+  --itrt-lav:#F6F1FF; --itrt-border:#ECEEF3;
+  --itrt-text:#111213; --itrt-muted:#6A6D76;
+}
+
+/* 폰트: EN=Roboto, KO=Noto Sans KR */
+html,body{
+  font-family: Roboto, "Noto Sans KR", "Apple SD Gothic Neo",
+               -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Arial, Helvetica, sans-serif;
+  color:var(--itrt-text); background:#fff;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+:lang(ko){ font-family:"Noto Sans KR", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif; }
+:lang(en){ font-family:Roboto, "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif; }
+
+/* Navbar */
+.fixed-top.bg-white .navbar{ height:88px; border-bottom:1px solid #F0EEFA; box-shadow:0 2px 10px rgba(17,17,26,.03); }
+.navbar .navbar-nav .nav-link{ padding:10px 14px; font-weight:600; color:#2a2a2a; }
+.navbar .navbar-nav .nav-link:hover, .navbar .navbar-nav .nav-link:focus{ color:var(--itrt-purple); outline:none; text-decoration:none; }
+.navbar .dropdown-menu{ border:1px solid var(--itrt-border); border-radius:12px; box-shadow:0 10px 28px rgba(17,17,26,.10); overflow:hidden; }
+.dropdown .dropdown-menu a{ padding:.6rem .9rem; font-weight:500; }
+.dropdown .dropdown-menu a:hover{ background:var(--itrt-lav); color:var(--itrt-purple); }
+
+/* Search bar */
+#search-form .form-select, #search-form .form-control{
+  border:2px solid #6900B8 !important; height:55px; box-shadow:none;
+  transition:border .15s ease, box-shadow .15s ease;
+}
+#search-form .form-select:focus, #search-form .form-control:focus{
+  border-color:var(--itrt-purple) !important; box-shadow:0 0 0 .22rem rgba(105,0,184,.20);
+}
+#search-form .btn{
+  background:var(--itrt-purple) !important; border-color:var(--itrt-purple) !important;
+  border-radius:999px; font-weight:700; padding:.8rem 1.2rem;
+  transition: transform .08s ease, box-shadow .2s ease;
+}
+#search-form .btn:hover{ transform: translateY(-1px); box-shadow:0 8px 18px rgba(105,0,184,.18); }
+#selected-option-text{ color:#111 !important; text-shadow:0 1px 2px rgba(255,255,255,.8); }
+
+/* Spinner & Modal */
+#spinner.show .spinner-grow{ color:var(--itrt-purple) !important; }
+#searchModal .modal-content{ background:#fff; border:1px solid var(--itrt-border); box-shadow:0 24px 48px rgba(17,17,26,.12); border-radius:16px; }
+
+/* Pagination */
+.pagination{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.pagination a, .pagination .page-link{
+  border-radius:12px; border:1px solid #D9D5E5; background:#fff; color:#1d1d1d;
+  font-weight:600; padding:8px 14px; min-width:36px; transition:all .15s ease; box-shadow:0 1px 0 rgba(0,0,0,.02);
+}
+.pagination .page-link:hover{ border-color:#BFA7F0; background:var(--itrt-lav); color:var(--itrt-purple); text-decoration:none; }
+.page-item.active .page-link{ background:var(--itrt-purple); border-color:var(--itrt-purple); color:#fff; }
+.pagination .page-link:focus{ outline:none; box-shadow:0 0 0 .22rem rgba(105,0,184,.25); }
+
+/* Back to top */
+.back-to-top{ background:var(--itrt-purple) !important; border-color:var(--itrt-purple) !important; }
+.back-to-top:hover{ filter:brightness(1.08); }
+
+/* 보조 */
+.text-muted{ color:var(--itrt-muted) !important; }
+
+  /* 헤더 전체 배경 높이 늘리기 */
+.container-fluid.fixed-top.bg-white {
+  background-color: #fff !important;
+  min-height: 160px;   /* ✅ 기존보다 조금 더 길게 */
+  z-index: 1030;
+  box-shadow: 0 2px 10px rgba(17,17,26,0.05);
+}
+/* 💜 메뉴 클릭 시(활성화 시) 보라색 표시 */
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:focus,
+.navbar-nav .nav-link:hover {
+    color: #6900B8 !important;     /* 글자색 보라색 */
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+/* 💜 보라색 테두리 + 흰색 안쪽 스타일 */
+.purple-outline-icon {
+  color: #fff; /* 안쪽 흰색 */
+  -webkit-text-stroke: 2px #6900B8; /* 보라색 외곽선 */
+  transition: all 0.25s ease-in-out;
+}
+
+/* 🟣 마우스 오버 시 반전 효과 */
+.purple-outline-icon:hover {
+  color: #6900B8;              /* 내부를 보라색으로 채움 */
+  -webkit-text-stroke: 2px #6900B8;
+  transform: scale(1.05);      /* 살짝 확대 */
+}
+
+/************** 폰트 **************************/
+/* 기본: 라틴은 Roboto, 한글은 Noto Sans KR */
+html { 
+  font-family: 'Roboto','Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+
+/* 언어별 더 명확히 */
+:lang(ko), [lang="ko"] {
+  font-family: 'Noto Sans KR','Roboto', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+:lang(en), [lang^="en"] {
+  font-family: 'Roboto','Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+
+/* 폼 요소도 상속받게 */
+button, input, select, textarea { font-family: inherit; }

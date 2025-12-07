@@ -1,0 +1,43 @@
+{# --- search/partials/_pagination.html --- #}
+{% if page_obj %}
+<nav aria-label="검색 결과 페이지" id="pagination">
+  <ul class="pagination justify-content-center">
+    {# 처음/이전 #}
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" aria-label="처음" href="?page=1&{{ base_query }}">« 처음</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" aria-label="이전" href="?page={{ page_obj.previous_page_number }}&{{ base_query }}">‹ 이전</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">« 처음</span></li>
+      <li class="page-item disabled"><span class="page-link">‹ 이전</span></li>
+    {% endif %}
+
+    {# 숫자 페이지: view에서 전달한 page_range 사용 #}
+    {% for num in page_range %}
+      {% if page_obj.number == num %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% else %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}&{{ base_query }}">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {# 다음/마지막 #}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" aria-label="다음" href="?page={{ page_obj.next_page_number }}&{{ base_query }}">다음 ›</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" aria-label="마지막" href="?page={{ page_obj.paginator.num_pages }}&{{ base_query }}">마지막 »</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">다음 ›</span></li>
+      <li class="page-item disabled"><span class="page-link">마지막 »</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

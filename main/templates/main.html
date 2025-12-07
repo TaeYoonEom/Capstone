@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}?v=1">
+
+<div class="container-fluid py-2 mb-2 hero-header">
+    <div class="container py-4">
+        <div class="row g-4">
+            <!-- 첫 번째 박스: 인기 키워드 -->
+            <div class="col-lg-4">
+                <div class="border rounded p-4 bg-light" style="height: 330px;">
+                    <h5 style="color: black; border-bottom: 3px solid #6900B8; padding-bottom: 15px;">
+                        인기 키워드
+                    </h5>
+        
+                    <!-- 키워드 목록 (검정색, 번호 표시) -->
+                    <ul class="list-unstyled" style="color: black; padding-left: 0;">
+                        {% for keyword in popular_keywords %}
+                            {% if keyword.id %}
+                                <li>
+                                    <a href="{% url 'keyword_page' keyword.id %}" style="text-decoration: none; color: black;">
+                                        {{ forloop.counter }}. {{ keyword.keyword }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li style="color: gray;">
+                                    {{ forloop.counter }}. (키워드 없음)
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 두 번째 박스: 인기 자료 (파트, 논문 이름 목록) -->
+            <div class="col-lg-8">
+                <div class="border rounded p-4 bg-light" style="height: 330px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <h5 style="color: black; border-bottom: 3px solid #6900B8; padding-bottom: 15px;">인기 자료</h5>
+                    <!-- 목록을 감싸는 영역 -->
+                    <ul class="list-unstyled d-flex flex-column m-0 p-0" style="flex: 1; margin-top: 5px;">
+                        
+                        <!-- 5개 인기 논문 -->
+                        {% for paper in popular_papers|slice:":5" %}
+                        <li style="flex: 1; display: flex; align-items: center; border-bottom: 1px solid #ccc; padding: 0 5px;">
+                            <a href="{% url 'paper_page' paper.id %}" style="text-decoration: none; color: black;">
+                                {{ forloop.counter }}. {{ paper.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+            
+                        <!-- 전체보기 (6번째 칸) -->
+                        <a href="{% url 'popular_papers_page' %}" class="btn btn-outline-danger" 
+                            style="color: #6900B8; border-color: #6900B8; margin-top: 10px;">
+                            전체보기 +
+                        </a>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 시각화 -->
+<div class="container-fluid featurs py-3">
+  <div class="container py-3">
+    <div class="viz-card text-center">
+      <div class="row g-0 align-items-center justify-content-center">
+
+        <!-- 등록 논문 키워드 -->
+        <div class="col-lg-4 col-md-12 viz-section">
+          <h5 class="viz-title">논문 키워드</h5>
+          <canvas id="keywordCloud" width="320" height="280"></canvas>
+        </div>
+
+        <!-- 등록된 파트 -->
+        <div class="col-lg-4 col-md-12 viz-section">
+          <h5 class="viz-title">연구분야 합계</h5>
+          <div id="part-pie-chart"></div>
+        </div>
+
+        <!-- TOP 5 인기 Part -->
+        <div class="col-lg-4 col-md-12 viz-section">
+          <h5 class="viz-title">TOP 5 인기 연구분야</h5>
+          <ul id="topSavedPartsList" class="list-unstyled viz-list">
+            <li>로딩 중...</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="container-fluid stat-section">
+    <div class="container">
+        <div class="row g-5 justify-content-center">
+  
+            <div class="col-md-6 col-lg-4">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="icon-box">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h4 id="affiliationCount" class="mb-1 text-purple fw-bold">기관 수 수집 중...</h4>
+                    <small class="text-muted">전국 기관와 함께합니다.</small>
+                </div>
+            </div>
+  
+            <div class="col-md-6 col-lg-4">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="icon-box">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h4 id="paperCount" class="mb-1 text-purple fw-bold">학술 논문 수 수집 중...</h4>
+                    <small class="text-muted">ITRT에서 필요한 학술논문을 검색하세요.</small>
+                </div>
+            </div>
+  
+            <div class="col-md-6 col-lg-4">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="icon-box">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h4 id="userCount" class="mb-1 text-purple fw-bold">이용자 수 수집 중...</h4>
+                    <small class="text-muted">수많은 이용자가 ITRT와 함께하고 있습니다!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tastimonial Start -->
+<div class="container-fluid testimonial py-5">
+    <div class="container py-5">
+        <div class="testimonial-header text-center">
+            <h4 class="text-primary">Developers</h4>
+            <h1 class="display-5 mb-5 text-dark">Developers Saying!</h1>
+        </div>
+        <div class="owl-carousel testimonial-carousel">
+            <div class="testimonial-item img-border-radius bg-light rounded p-4">
+                <div class="position-relative">
+                    <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
+                    <div class="mb-4 pb-4 border-bottom border-secondary">
+                        <p class="mb-0">Lorem Ipsum is simply dummy text of the printing Ipsum has been the industry's standard dummy text ever since the 1500s,
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center flex-nowrap">
+                        <div class="bg-secondary rounded">
+                            <img src="{% static 'img/avatar.jpg' %}" class="img-fluid rounded" style="width: 100px; height: 100px;" alt="">
+                        </div>
+                        <div class="ms-4 d-block">
+                            <h4 class="text-dark">Song min gyu</h4>
+                            <p class="m-0 pb-3">ANYANG UNIVERSITY (AYU)</p>
+                            <div class="d-flex pe-5">
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <!-- <i class="fas fa-star"></i> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-item img-border-radius bg-light rounded p-4">
+                <div class="position-relative">
+                    <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
+                    <div class="mb-4 pb-4 border-bottom border-secondary">
+                        <p class="mb-0">Lorem Ipsum is simply dummy text of the printing Ipsum has been the industry's standard dummy text ever since the 1500s,
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center flex-nowrap">
+                        <div class="bg-secondary rounded">
+                            <img src="{% static 'img/avatar.jpg' %}" class="img-fluid rounded" style="width: 100px; height: 100px;" alt="">
+                        </div>
+                        <div class="ms-4 d-block">
+                            <h4 class="text-dark">Eom Tae Yoon</h4>
+                            <p class="m-0 pb-3">ANYANG UNIVERSITY (AYU)</p>
+                            <div class="d-flex pe-5">
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-item img-border-radius bg-light rounded p-4">
+                <div class="position-relative">
+                    <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
+                    <div class="mb-4 pb-4 border-bottom border-secondary">
+                        <p class="mb-0">Lorem Ipsum is simply dummy text of the printing Ipsum has been the industry's standard dummy text ever since the 1500s,
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center flex-nowrap">
+                        <div class="bg-secondary rounded">
+                            <img src="{% static 'img/testimonial-1.jpg' %}" class="img-fluid rounded" style="width: 100px; height: 100px;" alt="">
+                        </div>
+                        <div class="ms-4 d-block">
+                            <h4 class="text-dark">Jeon Ji Sun</h4>
+                            <p class="m-0 pb-3">ANYANG UNIVERSITY (AYU)</p>
+                            <div class="d-flex pe-5">
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                                <i class="fas fa-star text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tastimonial End -->
+
+
+
+<!-- 워드클라우드 스크립트 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    $.ajax({
+        url: '/keyword_cloud_data/',
+        method: 'GET',
+        success: function (data) {
+            const words = data.map(item => [item.text, item.size]);
+
+            // 🎨 강한 대비형 색상 팔레트
+            const vividColors = [
+                "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
+            ];
+
+            // 워드클라우드 생성
+            WordCloud(document.getElementById('keywordCloud'), {
+                list: words,
+                gridSize: 8,
+                weightFactor: 0.8,
+                fontFamily: 'Noto Sans KR, Roboto, sans-serif',
+                color: function () {
+                    return vividColors[Math.floor(Math.random() * vividColors.length)];
+                },
+                backgroundColor: 'rgba(255,255,255,0)',
+                rotateRatio: 0.2,
+                rotationSteps: 2,
+                minSize: 12,
+                fontWeight: '700',   // 더 선명하게 강조
+                shuffle: true,
+                shape: 'circle'
+            });
+        },
+        error: function (error) {
+            console.error('Error fetching keyword cloud data:', error);
+        }
+    });
+});
+</script>
+
+
+<!-- 실시간 파트 수 -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<div id="part-pie-chart"></div>
+
+<script>
+fetch("{% url 'part_pie_chart' %}")
+  .then(r => r.json())
+  .then(data => {
+    // ── 컨테이너 크기(반응형)
+    const host = document.querySelector("#part-pie-chart");
+    const rect = host.getBoundingClientRect();
+    const W = Math.min(360, rect.width || 320);
+    const H = W;
+    const R = W/2 - 6;
+
+    // ── 딥톤 팔레트 (고정 순서)
+    const palette = [
+      "#4B0082", "#1F3A93", "#0B6E4F", "#C14601", "#A40E26",
+      "#7A1FA2", "#9A6A00", "#0F3D8A", "#00796B", "#8E1355"
+    ];
+    const color = d3.scaleOrdinal(palette);
+
+    // ── 기존 내용 제거 + 제목
+    host.innerHTML = "";
+    const title = document.createElement("div");
+    title.className = "pie-title";
+    host.appendChild(title);
+
+    // ── SVG
+    const svg = d3.select(host)
+      .append("svg")
+      .attr("width", W).attr("height", H);
+
+    const g = svg.append("g")
+      .attr("transform", `translate(${W/2},${H/2})`);
+
+    const total = d3.sum(data, d => d.value);
+    const pie   = d3.pie().sort(null).value(d => d.value);
+    const arc   = d3.arc().innerRadius(R * 0.5).outerRadius(R); // 도넛 두께 조금 얇게
+    const labelArc = d3.arc().innerRadius(R * 0.92).outerRadius(R * 0.6);
+
+    // ── 툴팁
+    const tip = d3.select("body").append("div").attr("class","viz-tip");
+
+    // ── 슬라이스
+    g.selectAll("path.slice")
+      .data(pie(data))
+      .enter().append("path")
+        .attr("class","slice")
+        .attr("d", arc)
+        .attr("fill", d => color(d.data.name))
+        .attr("stroke", "#fff").attr("stroke-width", 2)
+        .on("mousemove", (ev, d) => {
+          const pct = (d.data.value / total * 100).toFixed(1);
+          tip.style("opacity", 1)
+             .html(`<strong>${d.data.name}</strong><br>${d.data.value.toLocaleString()}건 · ${pct}%`)
+             .style("left", (ev.pageX + 12) + "px")
+             .style("top",  (ev.pageY - 30) + "px");
+        })
+        .on("mouseleave", () => tip.style("opacity", 0));
+
+    // ── 퍼센트 라벨(큰 조각만 표시: 6% 이상)
+    const showPct = d => (d.data.value / total) >= 0.06;
+    g.selectAll("text.pct")
+      .data(pie(data).filter(showPct))
+      .enter().append("text")
+        .attr("class","pct")
+        .attr("transform", d => `translate(${labelArc.centroid(d)})`)
+        .attr("dy", "0.35em")
+        .style("font-size","12px")
+        .style("font-weight","700")
+        .style("fill","#111")
+        .style("text-anchor","middle")
+        .text(d => `${(d.data.value/total*100).toFixed(0)}%`);
+
+    // ── 중앙 합계
+    g.append("text")
+      .attr("class","center-value")
+      .attr("text-anchor","middle")
+      .attr("y",-2)
+      .text(total.toLocaleString());
+    g.append("text")
+      .attr("class","center-label")
+      .attr("text-anchor","middle")
+      .attr("y",14)
+      .text("논문수 합계");
+
+    // ── 2열 범례(항상 검정 글씨)
+    const legend = document.createElement("div");
+    legend.className = "pie-legend";
+    data.forEach(d => {
+      const item = document.createElement("div");
+      item.innerHTML = `<i style="background:${color(d.name)}"></i> ${d.name}`;
+      legend.appendChild(item);
+    });
+    host.appendChild(legend);
+  })
+  .catch(err => console.error(err));
+</script>
+
+<!-- 순위 리스트 가져오는 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    fetch('/get_top_saved_parts/')
+        .then(response => response.json())
+        .then(data => {
+            const listContainer = document.getElementById('topSavedPartsList');
+            listContainer.innerHTML = ''; // 기존 내용 제거
+
+            if (data.length === 0) {
+                listContainer.innerHTML = '<li class="list-group-item">저장된 파트가 없습니다.</li>';
+                return;
+            }
+
+            // 순위 리스트 생성 (순위 | 파트 이름 | 저장 횟수)
+            data.forEach((item, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item rank-list-item';
+                listItem.innerHTML = `
+                    <strong class="rank-number">${index + 1}.</strong>
+                    <span class="rank-name">${item.name}</span>
+                    <span class="badge bg-danger rank-count">${item.count}건</span>
+                `;
+                listContainer.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching top saved parts:', error);
+            document.getElementById('topSavedPartsList').innerHTML = '<li class="list-group-item text-danger">데이터를 불러오는 중 오류 발생</li>';
+        });
+});
+</script>
+
+<!-- affiliation 수 가져오는 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/get_affiliation_count/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('affiliationCount').innerText = `${data.affiliation_count}개 기관 수`;
+            })
+            .catch(error => console.error('Error fetching affiliation count:', error));
+    });
+</script>
+
+<!-- 논문 수 가져오는 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/get_paper_count/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('paperCount').innerText = `${data.paper_count.toLocaleString()}편의 학술논문`;
+            })
+            .catch(error => console.error('Error fetching paper count:', error));
+    });
+</script>
+
+<!-- 이용자 수 가져오는 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/get_user_count/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userCount').innerText = `${data.user_count.toLocaleString()}명의 이용자 수`;
+            })
+            .catch(error => console.error('Error fetching user count:', error));
+    });
+</script>
+
+{% endblock %}

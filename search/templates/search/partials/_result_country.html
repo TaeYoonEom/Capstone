@@ -1,0 +1,46 @@
+{% if results %}
+    {% if filter_type == "country" %}   
+        {% for ct in results %}
+            <div class="mb-4 p-3 border shadow-sm rounded d-flex align-items-start">
+                <div class="flex-grow-1">
+                    <h5 class="mb-2 text-dark fw-bold">
+                        <a href="{% url 'country_page' country_id=ct.id %}" class="mb-2 fw-bold" style="color: black;">
+                            {{ ct.name }}
+                        </a>
+                    </h5>
+                    {% if ct.top_keywords %}
+                    <p class="mb-2 text-secondary" style="font-size: 0.85rem;">
+                        {% for kw in ct.top_keywords %}
+                        <a href="{% url 'keyword_page' kw.id %}"
+                            class="badge bg-light me-1"
+                            style="color:#6900B8; text-decoration:none;">
+                            #{{ kw.name }}
+                        </a>
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+                    <p class="mb-2" style="font-size: 0.85rem; color:black;">
+                        <strong>저자수 </strong> {{ ct.author_count|default:0 }}|
+                        <strong>기관수 </strong> {{ ct.affiliation_count|default:0 }} |                                 
+                        <strong>논문수 </strong> {{ ct.paper_count|default:0 }} |
+                        <strong>평균 인용수 </strong> {{ ct.avg_citations|floatformat:2|default:0 }}
+                    </p>
+                </div>
+                <!-- 하트 버튼 -->
+                <div class="d-flex flex-column align-items-center ms-auto align-self-center" data-like="container">
+                    <button class="btn like-btn"
+                            data-id="{{ ct.id }}"
+                            data-type="country"
+                            data-like-url="{% url 'like_country' item_id=ct.id %}"
+                            data-logged-in="{% if user_id %}true{% else %}false{% endif %}" 
+                            style="border: none; background: none;">
+                        <i class="fa-{% if ct.liked %}solid{% else %}regular{% endif %} fa-heart text-danger" style="font-size: 24px;"></i>
+                    </button>
+                    <span class="like-count" data-id="{{ ct.id }}" data-type="country">{{ ct.like_count }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-danger">검색 결과가 없습니다.</p> 
+    {% endif %}
+{% endif %}

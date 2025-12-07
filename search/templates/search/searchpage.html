@@ -1,0 +1,692 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+
+<link rel="stylesheet" href="{% static 'search/css/search_style.css' %}">
+
+<div class="container-fluid fruite py-5">
+    <div class="container-fluid wide-container py-5">
+        {% if query %}
+        <h1 class="text-center text-dark display-6">"{{ query }}" 검색 결과</h1>
+        {% else %}
+        <h1 class="text-center text-dark display-6">검색 결과 없음</h1>
+        {% endif %}
+        
+        <div class="row search-row no-wrap">
+            <div class="col-lg-3 col-xxl-2">
+                <aside class="filter-panel">
+                    <div class="limSearch mb-3 d-flex justify-content-between align-items-center">
+                        <!-- 왼쪽: 필터 제목 -->
+                        <p class="fw-bold mb-1" style="color: #000000;">검색 조건</p>
+
+                        <!-- 오른쪽: 초기화 버튼 -->
+                        <a href="?query={{ query }}&filter={{ filter_type }}&page=1"
+                        class="btn reset-btn">
+                            <i class="fas fa-redo me-1"></i> 선택 초기화
+                        </a>
+                    </div>
+
+
+                    <!-- 동적 필터링 UI -->
+                    <form name="group" method="GET" action="{% url 'search' %}">
+                        <input type="hidden" name="query" value="{{ query }}">
+                        <input type="hidden" name="filter" value="{{ filter_type }}">
+                        <input type="hidden" name="items_per_page" value="{{ items_per_page|default:10 }}">
+                        <input type="hidden" name="sort_order" value="{{ request.GET.sort_order|default:'desc' }}">
+
+                        {% if available_filters %}
+                        {% for filter_name, filter_values in available_filters.items %}
+                        {% if filter_values %}
+                        <details open class="filter-group" data-filter="{{ filter_name }}">
+                             <summary>
+                                <span class="summary-text">
+                                    {% if filter_name == "parts" %}연구 분야
+                                    {% elif filter_name == "years" %}연도
+                                    {% elif filter_name == "countries" %}국가
+                                    {% elif filter_name == "authors" %}저자
+                                    {% elif filter_name == "affiliations" %}기관
+                                    {% elif filter_name == "publishers" %}발행처
+                                    {% endif %}
+                                </span>
+                                <i class="fas fa-chevron-down caret"></i>
+                            </summary>
+
+                            <!-- 필터 리스트 -->
+                            <div class="filter-scroll">
+                                <ul class="list-unstyled mb-0">
+                                    {% for value in filter_values %}
+                                    <li class="form-check">
+                                        <input class="form-check-input custom-purple-checkbox"
+                                        id="{{ filter_name }}_{{ value }}"
+                                        type="checkbox"
+                                        name="{{ filter_name }}[]" value="{{ value }}">
+                                        
+                                        <label class="form-check-label text-dark" for="{{ filter_name }}_{{ value }}">
+                                        {{ value }}
+                                        </label>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+
+                                <div id="filter-list-extra-{{ filter_name }}" class="d-none">
+                                    {% for value in filter_values %}
+                                    <li class="form-check">
+                                    <input
+                                        class="form-check-input custom-purple-checkbox"
+                                        id="{{ filter_name }}_{{ value }}"
+                                        type="checkbox"
+                                        name="{{ filter_name }}[]"
+                                        value="{{ value }}" >
+                                    <label class="form-check-label text-dark" for="{{ filter_name }}_{{ value }}">
+                                        {{ value }}
+                                    </label>
+                                    </li>
+                                    {% endfor %}
+                                </div>
+                            </ul>
+                            
+                        </details>
+                        {% endif %}
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-muted">현재 검색 결과에 적용 가능한 필터가 없습니다.</p>
+                        {% endif %}
+                    </form>
+                </div>
+            </aside>
+
+            <!-- 오른쪽 검색 결과 (9 컬럼) -->
+            <div class="col-lg-8 col-xxl-8">
+                <div class="container-fluid py-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            {% if query %}
+                            <span class="fw-bold fs-5 text-dark" >
+                                검색결과 <span id="results-count" class="text-secondary">({{ results_count }}건)</span>
+                            </span>
+                            {% else %}
+                            <span class="fw-bold fs-5 text-dark">🔍 검색 페이지</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- 오른쪽 영역: 정렬 옵션, 페이지 개수 -->
+                        <div class="d-flex align-items-center me-4" id="sort-bar">
+                            {% with selected=sort_by_list %}
+                                {% if filter_type == "paper" %}
+                                <a href="#" class="me-3 sort-link text-dark {% if 'accuracy' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="accuracy" style="text-decoration:none;">
+                                    {% if 'accuracy' in selected %}✔ {% endif %}정확도순
+                                </a>
+                                <a href="#" class="me-3 sort-link text-dark {% if 'citations' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="citations" style="text-decoration:none;">
+                                    {% if 'citations' in selected %}✔ {% endif %}인용수순
+                                </a>
+                                <a href="#" class="sort-link text-dark {% if 'latest' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="latest" style="text-decoration:none;">
+                                    {% if 'latest' in selected %}✔ {% endif %}최신순
+                                </a>
+                                {% elif filter_type == "author" %}
+                                <a href="#" class="me-3 sort-link text-dark {% if 'accuracy' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="accuracy" style="text-decoration:none;">
+                                    {% if 'accuracy' in selected %}✔ {% endif %}정확도순
+                                </a>
+                                <a href="#" class="me-3 sort-link text-dark {% if 'papers' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="papers" style="text-decoration:none;">
+                                    {% if 'papers' in selected %}✔ {% endif %}논문수순
+                                </a>
+                                <a href="#" class="sort-link text-dark {% if 'citations' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="citations" style="text-decoration:none;">
+                                    {% if 'citations' in selected %}✔ {% endif %}인용수순
+                                </a>
+                                {% elif filter_type == "affiliation" %}
+                                <a href="#" class="me-3 sort-link text-dark {% if 'accuracy' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="accuracy" style="text-decoration:none;">
+                                    {% if 'accuracy' in selected %}✔ {% endif %}정확도순
+                                </a>
+                                <a href="#" class="me-3 sort-link text-dark {% if 'papers' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="papers" style="text-decoration:none;">
+                                    {% if 'papers' in selected %}✔ {% endif %}논문수순
+                                </a>
+                                <a href="#" class="sort-link text-dark {% if 'citations' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="citations" style="text-decoration:none;">
+                                    {% if 'citations' in selected %}✔ {% endif %}인용수순
+                                </a>
+                                {% elif filter_type == "keyword" %}
+                                <a href="#" class="me-3 sort-link text-dark {% if 'accuracy' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="accuracy" style="text-decoration:none;">
+                                    {% if 'accuracy' in selected %}✔ {% endif %}정확도순
+                                </a>
+                                <a href="#" class="sort-link text-dark {% if 'papers' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="papers" style="text-decoration:none;">
+                                    {% if 'papers' in selected %}✔ {% endif %}논문수순
+                                </a>
+                                {% elif filter_type == "country" %}
+                                <a href="#" class="me-3 sort-link text-dark {% if 'accuracy' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="accuracy" style="text-decoration:none;">
+                                    {% if 'accuracy' in selected %}✔ {% endif %}정확도순
+                                </a>
+                                <a href="#" class="me-3 sort-link text-dark {% if 'papers' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="papers" style="text-decoration:none;">
+                                    {% if 'papers' in selected %}✔ {% endif %}논문수순
+                                </a>
+                                <a href="#" class="sort-link text-dark {% if 'citations' in selected %}fw-bold text-danger{% endif %}"
+                                    data-key="citations" style="text-decoration:none;">
+                                    {% if 'citations' in selected %}✔ {% endif %}인용수순
+                                </a>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            <div class="dropdown">
+                                <button class="btn btn-link dropdown-toggle text-dark" type="button"
+                                    id="itemsPerPageDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="text-decoration: none;">
+                                    {{ items_per_page|default:10 }}개씩
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="itemsPerPageDropdown">
+                                    <li><a class="dropdown-item" href="?{{ base_query }}&items_per_page=10">10개씩</a></li>
+                                    <li><a class="dropdown-item" href="?{{ base_query }}&items_per_page=20">20개씩</a></li>
+                                    <li><a class="dropdown-item" href="?{{ base_query }}&items_per_page=50">50개씩</a></li>
+                                    <li><a class="dropdown-item" href="?{{ base_query }}&items_per_page=100">100개씩</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lottie Loader 오버레이 -->
+                <div id="spinner-overlay">
+                    <div class="spinner-box">
+                        <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_usmfx6bp.json"
+                            background="transparent" speed="1" style="width: 100px; height: 100px;" loop autoplay>
+                        </lottie-player>
+                        <p class="text-white mt-2">로딩 중입니다...</p>
+                    </div>
+                </div>
+
+                <!-- 검색 결과 리스트 -->
+                <div class="container mt-3" id="search-results">
+                    <div class="container mt">
+                        {% if filter_type == 'paper' %}
+                        {% include "search/partials/_result_paper.html" %}
+                        {% elif filter_type == 'author' %}
+                        {% include "search/partials/_result_author.html" %}
+                        {% elif filter_type == 'affiliation' %}
+                        {% include "search/partials/_result_affiliation.html" %}
+                        {% elif filter_type == 'keyword' %}
+                        {% include "search/partials/_result_keyword.html" %}
+                        {% elif filter_type == 'country' %}
+                        {% include "search/partials/_result_country.html" %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div id="pagination-wrapper">
+                    {% include 'search/partials/_pagination.html' %}
+                </div>
+
+            </div>
+            {% if filter_type == "paper" or filter_type == "keyword" %}
+            <aside class="col-lg-3 col-xxl-2">
+                <div class="info-box">
+                    <div id="wordcloud-container">
+                        {% if words_data_json %}
+                        <div id="wordcloud"></div>
+
+                        <script src="https://d3js.org/d3.v6.min.js"></script>
+                        <script
+                            src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud@master/build/d3.layout.cloud.js"></script>
+
+                        <script>
+                            (function () {
+                                var wordsData = JSON.parse('{{ words_data_json|safe }}');
+                                const currentFilter = "{{ filter_type }}";  
+                                
+                                const WORD_LIMIT = 30;   
+                                const scores = wordsData.map(d => d.score);
+                                const minS = Math.min(...scores), maxS = Math.max(...scores);
+                                const sizeScale = d3.scaleLinear().domain([minS, maxS]).range([14, 42]); // 필요시 [12, 48] 등 조정
+
+                                
+                                const colors = ["#FFB6B9", "#BBDED6", "#8AC6D1", "#6C5B7B", "#355C7D",
+                                                "#1E88E5", "#42A5F5", "#4DD0E1", "#26A69A", "#66BB6A", "#9CCC65",
+                                                "#000000", "#424242", "#616161", "#9E9E9E", "#FBC02D", "#EF6C00"];
+
+                                const width = 260, height = 260;
+
+                                const layout = d3.layout.cloud()
+                                    .size([width, height])
+                                    .words(
+                                    wordsData.slice(0, WORD_LIMIT).map(d => ({
+                                        text: d.text,
+                                        id: d.id,
+                                        size: sizeScale(d.score)    // ← 스케일 적용
+                                    }))
+                                    )
+                                    .padding(2)                     // ← 살짝 줄여 더 많이 배치
+                                    .rotate(() => 0)                // 0도로 고정(가독성↑)
+                                    .spiral("archimedean")          // 기본 스파이럴
+                                    .font('"Nanum Gothic", sans-serif')
+                                    .fontSize(d => d.size)
+                                    .on("end", drawCloud);
+
+                                layout.start();
+
+                                function drawCloud(words) {
+                                    d3.select("#wordcloud").html("");
+
+                                    d3.select("#wordcloud")
+                                        .append("svg")
+                                        .attr("width", layout.size()[0])
+                                        .attr("height", layout.size()[1])
+                                        .attr("viewBox", `0 0 ${width} ${height}`)
+                                        .append("g")
+                                        .attr("transform", `translate(${width / 2}, ${height / 2})`)
+                                        .selectAll("text")
+                                        .data(words)
+                                        .enter().append("text")
+                                        .style("font-family", '"Nanum Gothic", sans-serif')
+                                        .style("font-size", d => d.size + "px")
+                                        .style("fill", (d, i) => colors[i % colors.length])
+                                        .attr("text-anchor", "middle")
+                                        .attr("transform", d => `translate(${d.x},${d.y})rotate(${d.rotate})`)
+                                        .style("cursor", "pointer")
+                                        .on("click", function (event, d) {
+                                            const searchBox = document.getElementById("search-box");
+                                            const filterSelect = document.getElementById("filter");
+                                            const searchForm = document.getElementById("search-form");
+
+                                            if (searchBox && filterSelect && searchForm) {
+                                                searchBox.value = d.text;
+                                                filterSelect.value = currentFilter;  
+                                                searchForm.submit();
+                                            }
+                                        })
+                                        .text(d => d.text);
+                                }
+                            })();
+                        </script>
+                        {% else %}
+                        <p>추천 키워드를 분석 중입니다...</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </aside>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    const USER_ID = Number('{{ user_id|default:"0" }}') || 0;
+    const IS_LOGGED_IN = USER_ID > 0;
+    window.user_id = USER_ID; // 필요 시 하위 호환
+    console.log("USER_ID:", USER_ID, "IS_LOGGED_IN:", IS_LOGGED_IN);
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // 좋아요 버튼 바인딩
+    function bindLikeButtons() {
+    // 중복 바인딩 방지
+        document.querySelectorAll(".like-btn").forEach(btn => {
+            const clone = btn.cloneNode(true);
+            btn.replaceWith(clone);
+        });
+
+        document.querySelectorAll(".like-btn").forEach(button => {
+            button.addEventListener("click", async function () {
+                const loggedIn = this.getAttribute("data-logged-in") === "true";
+                if (!loggedIn) return alert("로그인 후 이용 가능합니다!");
+
+                const itemId = this.getAttribute("data-id");
+                const itemType = this.getAttribute("data-type");
+                const url = this.dataset.likeUrl;
+                const icon = this.querySelector("i");
+
+                // ✅ like-count 탐색: 형제 → 부모컨테이너 → 전역(data-* 마커)
+                let likeCountSpan = null;
+
+                if (this.nextElementSibling?.classList.contains("like-count")) {
+                    likeCountSpan = this.nextElementSibling;
+                }
+                if (!likeCountSpan) {
+                    const container = this.closest('[data-like="container"]');
+                    likeCountSpan = container?.querySelector(".like-count") || null;
+                }
+                if (!likeCountSpan) {
+                    likeCountSpan = document.querySelector(`.like-count[data-type="${itemType}"][data-id="${itemId}"]`);
+                }
+
+                try {
+                    const url = this.dataset.likeUrl; 
+                    const res = await fetch(url, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: { "X-CSRFToken": getCookie("csrftoken"), "X-Requested-With": "XMLHttpRequest" }
+                    });
+                    if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`${res.status} ${res.statusText}: ${text.slice(0,200)}`);
+                    }
+                    const data = await res.json();
+                    if (data.error) return alert(data.error);
+
+                    icon.classList.toggle("fa-solid", data.liked);
+                    icon.classList.toggle("fa-regular", !data.liked);
+                    icon.classList.toggle("text-danger", data.liked);
+
+                    if (likeCountSpan) likeCountSpan.textContent = data.count;
+                    else console.warn("like-count 요소를 찾지 못했습니다.", { itemType, itemId });
+                } catch (err) {
+                    console.error("❤️ like error:", err);
+                    alert("좋아요 처리 중 오류가 발생했습니다.");
+                }
+            });
+        });
+    }
+
+
+    // 논문 저장 기능
+    function bindSaveButton(savedPaperIds = new Set(), loggedIn = false){
+        const btn = document.querySelector(".save-selected-papers");
+        if (!btn) return;
+
+        // 기존 핸들러 제거용
+        const clone = btn.cloneNode(true);
+        btn.replaceWith(clone);
+        const button = document.querySelector(".save-selected-papers");
+
+        button.addEventListener("click", async () => {
+        if (!loggedIn) {
+            alert("로그인 후 이용 가능합니다!");
+            location.href = "/login/?next=" + encodeURIComponent(location.pathname + location.search);
+            return;
+        }
+
+        // ✔ 숫자형으로 일관 수집
+        const ids = Array.from(document.querySelectorAll("input[name='selected_papers']:checked"))
+            .map(cb => Number(cb.dataset.paperId || cb.value))
+            .filter(Number.isFinite);
+
+        if (ids.length === 0) {
+            alert("⚠️ 저장할 논문을 선택해주세요.");
+            return;
+        }
+
+        try {
+            const res = await fetch("/save_paper/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            credentials: "include",
+            body: JSON.stringify({ paper_ids: ids })
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (data?.message) {
+            alert(data.message);
+            } else if (data?.error) {
+            alert("⚠ 저장 실패: " + data.error);
+            } else {
+            alert("서버 응답을 확인할 수 없습니다.");
+            }
+        } catch (e) {
+            alert("네트워크 오류: " + e.message);
+        }
+        });
+    }
+
+    function updateResults(data) {
+        document.getElementById("search-results").innerHTML = data.html;
+        document.getElementById("pagination-wrapper").innerHTML = data.pagination_html;
+
+        const rc = document.getElementById("results-count");
+        if (rc) rc.textContent = `(${data.results_count}건)`;
+
+        const savedSet = new Set(data.saved_paper_ids);
+
+        bindLikeButtons();
+
+        const userId = window.user_id;
+        const loggedIn = Boolean(userId && parseInt(userId) > 0);
+        if (!loggedIn) {
+            console.warn("비로그인 상태입니다. 저장된 논문 조회를 생략합니다.");
+            return;
+        }
+
+        fetch("/get_saved_papers/")
+            .then(res => {
+                if (!res.ok) throw new Error("Unauthorized");
+                return res.json();
+            })
+            .then(data => {
+            const savedIds = (data.saved_paper_ids || []).map(Number);
+            bindSaveButton(new Set(savedIds), Boolean(IS_LOGGED_IN));
+
+            document.querySelectorAll("input[name='selected_papers']").forEach(checkbox => {
+                const pid = Number(checkbox.getAttribute("data-paper-id") || checkbox.value);
+                if (savedIds.includes(pid)) checkbox.checked = true;
+            });
+            })
+            .catch(err => {
+                console.warn("🚫 저장 논문 조회 실패:", err.message);
+            });
+
+        bindFilterCheckboxes();
+    }
+
+    // 정렬바 UI를 현재 URL 상태로 반영
+    function updateSortBarFromURL(urlLike = location.href) {
+        const u = new URL(urlLike, location.origin);
+        const selected = u.searchParams.getAll("sort_by"); // 멀티
+        document.querySelectorAll("#sort-bar .sort-link").forEach(a => {
+        const key = a.dataset.key;
+        const on = selected.includes(key);
+        a.classList.toggle("fw-bold", on);
+        a.classList.toggle("text-danger", on);
+        // 텍스트 앞의 ✔ 표시 갱신
+        const label = a.textContent.replace(/^✔\s*/,'').trim();
+        a.textContent = (on ? "✔ " : "") + label;
+        });
+    }
+
+    // 정렬 링크 클릭 → sort_by 토글 → Ajax
+    document.addEventListener("click", function(e){
+        const a = e.target.closest("#sort-bar .sort-link");
+        if (!a) return;
+        e.preventDefault();
+
+        const key = a.dataset.key;
+        if (!key) return;
+
+        // 현재 URL의 sort_by 배열을 토글
+        const url = new URL(location.href);
+        const p = url.searchParams;
+        const sorts = p.getAll("sort_by");
+        const idx = sorts.indexOf(key);
+
+        if (idx >= 0) {
+        // off
+        const next = sorts.filter(s => s !== key);
+        p.delete("sort_by");
+        next.forEach(s => p.append("sort_by", s));
+        } else {
+        // on (클릭 순서가 우선순위)
+        p.append("sort_by", key);
+        }
+
+        // 모두 꺼졌으면 기본값(accuracy)은 서버가 자동 적용 → 파라미터 자체를 비워둠
+        // 페이지는 1로 리셋
+        p.set("page", 1);
+
+        // Ajax 호출
+        const ajaxURL = url.pathname + "?" + p.toString();
+        showSpinner?.();
+        fetch(ajaxURL, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+        .then(r => r.json())
+        .then(data => {
+            updateResults(data);                   // 기존 함수: 결과/페이지네이션 교체
+            history.replaceState(null, "", ajaxURL); // URL 갱신
+            updateSortBarFromURL(ajaxURL);         // ⬅ 정렬바 UI도 갱신 (중요!)
+        })
+        .finally(() => hideSpinner?.());
+    });
+
+    // 초기 로드 시에도 현재 URL 반영
+    document.addEventListener("DOMContentLoaded", () => {
+        updateSortBarFromURL();
+    });
+
+    // 필터 체크/페이지네이션 등으로 Ajax 갱신 후에도 정렬 UI 다시 맞추기
+    //  - updateResults 끝에서 호출해주는 게 안전
+    const _origUpdateResults = window.updateResults;
+    window.updateResults = function(data) {
+        _origUpdateResults(data);
+        updateSortBarFromURL(); // ⬅ Ajax 이후 정렬바 UI 동기화
+    };
+
+    // ✅ 필터 체크박스 이벤트
+    function bindFilterCheckboxes() {
+        const form = document.forms["group"];
+        if (!form) return;
+
+        form.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+            checkbox.addEventListener("change", async () => {
+                showSpinner();
+
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData);
+                params.set("page", 1);
+
+                // ✅ 현재 URL의 정렬 파라미터를 유지
+                const now = new URL(location.href);
+                now.searchParams.getAll("sort_by").forEach(v => params.append("sort_by", v));
+                params.set("sort_order", now.searchParams.get("sort_order") || "desc");
+
+                try {
+                    const res = await fetch(`/search/?${params}`, {
+                    method: "GET",
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                    });
+                    const data = await res.json();
+                    updateResults(data);
+                    history.replaceState(null, "", `/search/?${params}`);
+                } catch (err) {
+                    console.error("❌ 필터링 실패:", err);
+                } finally {
+                    hideSpinner();
+                }
+            });
+        });
+    }
+
+    // ✅ DOM 로드시 초기 바인딩
+    document.addEventListener("DOMContentLoaded", () => {
+        bindLikeButtons();
+        bindSaveButton(new Set(), IS_LOGGED_IN); // ← 재계산 금지
+
+        if (IS_LOGGED_IN) {
+            fetch("/get_saved_papers/")
+            .then(res => res.json())
+            .then(data => {
+                const savedIds = (data.saved_paper_ids || []).map(Number);
+                bindSaveButton(new Set(savedIds), IS_LOGGED_IN); // 최신 saved 반영
+
+                document.querySelectorAll("input[name='selected_papers']").forEach(checkbox => {
+                const pid = Number(checkbox.dataset.paperId || checkbox.value);
+                if (savedIds.includes(pid)) checkbox.checked = true;
+                });
+            });
+        }
+
+        bindFilterCheckboxes();
+
+        document.querySelectorAll(".see-more").forEach(button => {
+            button.addEventListener("click", () => {
+                const targetId = button.getAttribute("data-target");
+                document.getElementById(targetId)?.classList.remove("d-none");
+                button.remove();
+            });
+        });
+    });
+    document.addEventListener("click", function(e){
+        const bar = e.target.closest(".sort-bar"); // 정렬 바 컨테이너
+        const a   = e.target.closest("a[href]");
+        if (!bar || !a) return;
+
+        const href = a.getAttribute("href") || "";
+        if (!/(\?|&)sort_by=/.test(href)) return; // 정렬 링크만 처리
+        e.preventDefault();
+
+        // 1) 클릭된 키 추출
+        const tmp = new URL(href, location.origin);
+        const key = tmp.searchParams.get("sort_by");
+        if (!key) return;
+
+        // 2) 현재 URL의 sort_by 배열 토글
+        const url = new URL(location.href);
+        const p = url.searchParams;
+        const sorts = p.getAll("sort_by");
+        const i = sorts.indexOf(key);
+
+        if (i >= 0) {
+            // 토글 off
+            const next = sorts.filter(s => s !== key);
+            p.delete("sort_by");
+            next.forEach(s => p.append("sort_by", s));
+        } else {
+            // 토글 on (순서 = 우선순위)
+            p.append("sort_by", key);
+        }
+        p.set("page", 1);
+
+        // 3) Ajax로 반영
+        showSpinner?.();
+        fetch(url.pathname + "?" + p.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" }})
+            .then(r => r.json())
+            .then(updateResults)
+            .finally(() => hideSpinner?.());
+    });
+
+
+    // ✅ 페이지 번호 클릭
+    document.addEventListener("click", function (e) {
+        const link = e.target.closest(".pagination a");
+        if (link) {
+            e.preventDefault();
+            const url = link.getAttribute("href");
+            showSpinner();
+
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(res => res.json())
+                .then(updateResults)
+                .finally(hideSpinner);
+        }
+    });
+
+    function showSpinner() {
+        document.getElementById("spinner-overlay").style.display = "flex";
+    }
+
+    function hideSpinner() {
+        document.getElementById("spinner-overlay").style.display = "none";
+    }
+</script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+
+{% endblock %}

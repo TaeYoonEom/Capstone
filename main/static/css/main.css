@@ -1,0 +1,343 @@
+/* ======================
+   HERO 카드/제목 오버라이드 (인라인 스타일 무시)
+   ====================== */
+/* 🔹 순위 리스트 전체 박스 */
+#topSavedPartsList {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 🔹 각 행 (순위 아이템) */
+.rank-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  font-family: "Noto Sans KR", "Roboto", sans-serif;
+  transition: background-color 0.2s ease;
+}
+
+/* 🔹 행 Hover 시 색 변화 */
+.rank-list-item:hover {
+  background-color: #f9f5ff; /* 살짝 연보라 */
+}
+
+/* 🔹 순위 번호 */
+.rank-number {
+  font-weight: 700;
+  color: #6900B8; /* 메인 포인트 컬러 */
+  flex: 0 0 35px; /* 고정 너비 */
+  text-align: left;
+}
+
+/* 🔹 파트 이름 */
+.rank-name {
+  flex-grow: 1;
+  text-align: center;
+  color: #111;
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 🔹 저장 횟수 뱃지 */
+.rank-count {
+  background-color: #e1c3f8 !important;
+  color: #fff !important;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  min-width: 40px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* 🔹 마지막 행 구분선 제거 */
+.rank-list-item:last-child {
+  border-bottom: none;
+}
+
+ .text-purple {
+    color: #6900B8 !important;
+}
+.bg-purple-light {
+    background-color: #f3e6ff !important; /* 연보라 배경 */
+}
+
+/* 1) 둥근 카드 & 고정 그림자 (인라인/부트스트랩보다 우선) */
+.hero-header .container .row .col-lg-4 > .border.rounded.p-4.bg-light,
+.hero-header .container .row .col-lg-8 > .border.rounded.p-4.bg-light{
+  background:#fff !important;
+  border:none !important;
+  border-radius:20px !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.08) !important;
+  height:460px !important;      /* 인라인 height와 동일하게 유지 */
+  padding:24px 26px !important;
+  transition:none !important;   /* 애니메이션 제거 */
+}
+
+/* 2) 제목 라인: 기존 인라인 border-bottom 제거 + 동일 길이(컨테이너 폭 100%) */
+.hero-header .border.rounded.p-4.bg-light > h5{
+  border-bottom:0 !important;         /* ← 인라인 border 제거 */
+  padding-bottom:6px !important;      /* ← 인라인 padding 덮기 */
+  margin:0 0 10px 0 !important;
+  line-height:1.2 !important;
+  color:#111 !important;
+  font-weight:700 !important;
+  position:relative !important;
+  display:block !important;
+  font-size:22px !important;  
+}
+.hero-header .border.rounded.p-4.bg-light > h5::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:-2px;       /* 동일 위치 */
+  height:3px; border-radius:3px;
+  background:linear-gradient(90deg,#6900B8 0%, #9a62dc 70%, rgba(255,255,255,0) 100%);
+}
+
+/* 3) 리스트 구분선/간격 통일 */
+/* 리스트: 글자 크기/행간/패딩 통일(조금 더 컴팩트) */
+.hero-header .col-lg-4 > .border.rounded.p-4.bg-light .list-unstyled{
+  flex: 1 1 auto !important; 
+  margin: 0 !important; 
+  padding: 0 !important;
+  overflow: hidden !important;            /* 넘침 방지 */
+}
+.hero-header .col-lg-4 > .border.rounded.p-4.bg-light .list-unstyled > li {
+  list-style: none !important;
+  padding: 7px 6px !important;                    /* 🔹 간격 축소로 정돈 */
+  border-bottom: 1px solid rgba(0,0,0,0.08) !important; /* 🔹 은은한 라인 */
+  font-size: 15px !important;                    /* 🔹 가독성 높은 폰트 크기 */
+  font-weight: 500 !important;                   /* 🔹 두께 중간 (너무 굵지 않게) */
+  letter-spacing: -0.2px !important;             /* 🔹 미세 자간 조정 */
+  font-family: 'Noto Sans KR', 'Roboto', sans-serif !important; /* 🔹 세련된 폰트 */
+  color: #222 !important;
+  transition: color 0.2s ease !important;
+}
+.hero-header .col-lg-4 > .border.rounded.p-4.bg-light .list-unstyled > li:hover {
+  color: #6900B8 !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transform: translateX(3px);                   /* 🔹 살짝 오른쪽으로 이동 효과 */
+}
+
+.hero-header .border.rounded.p-4.bg-light .list-unstyled > li:last-child{
+  border-bottom:none !important;
+}
+.hero-header .col-lg-4 > .border.rounded.p-4.bg-light .list-unstyled a {
+  text-decoration: none !important;
+  color: inherit !important;
+  display: inline-block;
+  width: 100%;
+}
+
+/* =============================
+   인기 자료 폰트·라인·간격 세련화
+   ============================= */
+.hero-header .col-lg-8 > .border.rounded.p-4.bg-light .list-unstyled > li {
+  list-style: none !important;
+  padding: 9px 6px !important;                     /* 🔹 간격 살짝 여유 */
+  border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+  font-size: 18px !important;                     /* 🔹 폰트 크기 동일 */
+  font-weight: 500 !important;                    /* 🔹 중간 두께 (세련된 느낌) */
+  letter-spacing: -0.2px !important;              /* 🔹 자간 미세 조정 */
+  font-family: 'Noto Sans KR', 'Roboto', sans-serif !important;
+  color: #222 !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+/* 🔹 hover 시 보라 포인트 강조 */
+.hero-header .col-lg-8 > .border.rounded.p-4.bg-light .list-unstyled > li:hover {
+  color: #6900B8 !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transform: translateX(3px);                     /* 🔹 부드러운 이동 효과 */
+}
+
+/* 🔹 링크에도 동일한 스타일 상속 */
+.hero-header .col-lg-8 > .border.rounded.p-4.bg-light .list-unstyled a {
+  text-decoration: none !important;
+  color: inherit !important;
+  display: inline-block;
+  width: 100%;
+  line-height: 1.4;
+}
+
+
+/* 4) '전체보기 +' 버튼: 폭/정렬/애니메이션 제거 */
+.hero-header .border.rounded.p-4.bg-light .btn.btn-outline-danger{
+  width:100% !important;
+  margin-top:12px !important;
+  border-radius:18px !important;
+  border-color:#6900B8 !important; color:#6900B8 !important;
+  font-weight:600 !important;
+  transition:none !important;
+}
+.hero-header .border.rounded.p-4.bg-light .btn.btn-outline-danger:hover{
+  background:#6900B8 !important; color:#fff !important;
+}
+
+/* 5) 혹시 남아있는 트랜지션 전부 제거 (선택) */
+.hero-header *{ transition:none !important; }
+
+/* ============ 공통: 글자는 무조건 검정 ============ */
+.featurs, .featurs * { color:#111 !important; }
+
+/* ============ 큰 카드 ============ */
+.viz-card{
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 10px 24px rgba(0,0,0,.08);
+  padding:18px 12px;                 /* 바깥 여백 */
+}
+
+/* ============ 섹션 ============ */
+.viz-section{
+  padding:16px 18px;
+  display:flex;
+  flex-direction:column;
+  min-height:360px;
+  position:relative;
+}
+
+/* 좌우 구분선(데스크톱) */
+@media (min-width: 992px){
+  .viz-section:not(:last-child){
+    border-right:1px solid rgba(0,0,0,.08);
+  }
+}
+/* 스택되는 모바일/태블릿에선 가로 구분선 */
+@media (max-width: 991.98px){
+  .viz-section{
+    min-height: auto;
+  }
+  .viz-section:not(:last-child){
+    border-bottom:1px solid rgba(0,0,0,.08);
+    padding-bottom:18px;
+    margin-bottom:10px;
+  }
+}
+
+/* ============ 제목(둥근배지 제거, 깔끔) ============ */
+.viz-title{
+  margin:2px 0 12px 0;
+  padding:0 0 8px 0;
+  font-family:'Noto Sans KR','Roboto',sans-serif;
+  font-size:22px;            /* 필요시 20~22px로 키워도 OK */
+  font-weight:700;
+  line-height:1.25;
+
+  border-radius:0;            /* 둥근 배지 제거 */
+  background:transparent !important;
+}
+
+/* ============ 콘텐츠 박스 ============ */
+.viz-body{
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+/* 차트/캔버스가 카드 밖으로 튀지 않도록 */
+#keywordCloud{ max-width:100%; height:auto; }
+#part-pie-chart > svg{ max-width:100%; height:auto; }
+
+/* ============ TOP5 리스트 ============ */
+.viz-list{
+  margin:8px 0 0 0; padding:0;
+  font-family:'Noto Sans KR','Roboto',sans-serif;
+  font-size:15px; font-weight:500;
+}
+.viz-list li{
+  list-style:none;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 6px;
+  border-bottom:1px solid rgba(0,0,0,.08);
+}
+.viz-list li:last-child{ border-bottom:none; }
+
+/* 파이 전용 */
+#part-pie-chart svg { font-family:"Noto Sans KR", system-ui, -apple-system, Roboto, sans-serif; }
+.viz-tip{
+  position:absolute; padding:8px 10px; background:#fff; color:#111;
+  border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.08);
+  pointer-events:none; opacity:0; font-size:13px;
+}
+/* 중앙 텍스트 */
+.center-value{ fill:#111; font-weight:800; font-size:22px; }
+.center-label{ fill:#6b7280; font-size:12px; }
+/* 2열 범례 */
+.pie-legend{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; margin-top:10px;
+  color:#111; font-size:13px;
+}
+.pie-legend i{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+.pie-title{ text-align:center; font-weight:800; color:#111; margin-bottom:6px; }
+
+
+/* 🔹 배경: 위 흰색 → 아래 연한 회색 */
+.stat-section {
+  background: linear-gradient(to bottom, #ffffff 0%, #e8e8ee 100%);
+  padding: 80px 0;
+}
+
+/* 🔹 아이콘 원형 */
+.icon-box {
+  width: 120px;
+  height: 120px;
+  border: 1.5px solid #d5c9f2;
+  border-radius: 50%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(105, 0, 184, 0.08);
+}
+
+/* 아이콘 색상 (보라 포인트) */
+.icon-box i {
+  font-size: 3rem;
+  color: #686767;
+  transition: 0.3s;
+}
+
+/* hover 시 강조 */
+.icon-box:hover {
+  transform: scale(1.05);
+  border-color: #c0c0c0;
+  box-shadow: 0 4px 12px rgba(105, 0, 184, 0.15);
+}
+
+/* 🔹 숫자 + 제목 */
+.stat-section h4 {
+  font-weight: 800;
+  font-size: 1.9rem;
+  color: #6900B8;
+  margin-bottom: 6px;
+}
+
+.stat-section h4 span {
+  color: #6900B8;
+}
+
+/* 🔹 부제 */
+.stat-section small {
+  color: #555;
+  font-size: 0.95rem;
+  letter-spacing: -0.2px;
+}
+
+

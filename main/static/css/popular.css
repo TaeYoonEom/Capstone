@@ -1,0 +1,17 @@
+ /* ✅ Google Fonts 불러오기 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
+
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', Arial, sans-serif !important;
+}
+  /* ✅ 페이지 전체 폰트 적용 */
+  .container { font-family: 'Noto Sans KR', 'Roboto', 'Apple SD Gothic Neo', 'Segoe UI', Arial, sans-serif; }
+
+  .table-header { background-color: #EDE7F6; color: #6900B8; font-weight: bold; height: 40px; }
+  .text-link { font-size: 16px; font-weight: bold; color: #1d1d1d; text-decoration: none; }
+  .text-link:hover { text-decoration: underline; color: #8E24AA; }
+
+  /* 뉴스 섹션 살짝 구분감 */
+  .news-section { margin-top: 28px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 12px; background:#EDE7F6; color:#6900B8; }
+  .meta { color:#6c757d; font-size: 12px; }

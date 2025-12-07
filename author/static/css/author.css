@@ -1,0 +1,766 @@
+
+    
+    /* 1) 논문 정보 테이블 스타일 */
+    .custom-table {
+        width: 100%;                         /* 테이블 전체 너비 사용 */
+        border-collapse: collapse;           /* 셀 경계선 병합 */
+        border-radius: 10px;                 /* 테두리 둥글게 */
+        overflow: hidden;                    /* 넘치는 내용 숨김 */
+        font-size: 16px;                     /* 폰트 크기 */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* 그림자 효과 */
+    }
+
+    .custom-table th {
+        background: linear-gradient(135deg, #6a0dad, #9b59b6); /* 그라데이션 배경 */
+        color: white;                    /* 흰색 텍스트 */
+        font-weight: bold;              /* 굵은 텍스트 */
+        text-align: center;               /* 가운데 정렬 */
+        padding: 1px;                  /* 안쪽 여백 */
+        border-bottom: 2px solid #9b59b6;
+    }
+
+    .custom-table td {
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .custom-table tr:nth-child(odd) {
+        background-color: #faf5ff;      /* 홀수 행 배경 (연보라) */
+    }
+
+    .custom-table tr:hover {
+        background-color: #f3e5f5;      /* 마우스 오버 시 배경 */
+        transition: 0.3s ease-in-out;
+    }
+
+    .custom-table tr:last-child td {
+        border-bottom: none;            /* 마지막 줄 아래 선 제거 */
+    }
+
+    /* 2) 파트 강조 텍스트 스타일 */
+    .highlight-text {
+        font-weight: bold;
+        color: #6a0dad;
+        font-size: 18px;
+        text-shadow: 1px 1px 2px rgba(106, 13, 173, 0.5); /* 그림자 효과 */
+    }
+
+    /* 3) 아이콘 전용 스타일 */
+    .icon {
+        margin-right: 8px;
+        color: #6a0dad;
+    }
+
+    /* 4) 키워드 테이블 스타일 */
+    .custom-keyword-table {
+        width: 200px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .custom-keyword-table td {
+        background-color: #f8f9fa;
+        padding: 12px;
+        font-size: 1rem;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: bold;
+        color: #6a0dad;
+        text-transform: capitalize;  /* 첫 글자 대문자 */
+    }
+
+    .custom-keyword-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .custom-keyword-table td:hover {
+        background-color: #e9ecef;
+        color: #4b0082;
+        transition: 0.3s;
+    }
+
+    /* 5) 저자 카드 스타일 */
+    .author-card {
+        background-color: #f9f9f9;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 6) 저자 프로필 이미지 */
+    .author-card img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 2px solid #6a0dad;
+        margin-right: 15px;
+    }
+
+    /* 7) 저자 이름 텍스트 */
+    .author-card h5 {
+        font-weight: bold;
+        color: #4b0082;
+        margin-bottom: 5px;
+    }
+
+    /* 8) 저자 소속 및 기타 정보 */
+    .author-card p {
+        margin-bottom: 3px;
+        font-size: 14px;
+    }
+
+    .author-card .author-country {
+        font-size: 12px;
+        color: #666;
+    }
+
+    /* 9) 분석 결과 박스 통일 스타일 */
+    .analysis-box {
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 10) 페이지네이션 가로 정렬 */
+    /* .pagination {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+    } */
+    /* ✅ 페이지네이션 전체 컨테이너 스타일 */
+    .pagination {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: -50px;
+    justify-content: center;  /* ✅ 가운데 정렬 */
+    }
+
+    /* ✅ 기본 페이지 버튼 스타일 */
+    .page-btn {
+    border: 1px solid #D1C4E9;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    color: #1d1d1d;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    }
+
+    /* ✅ 비활성(비클릭) 버튼 */
+    .page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    }
+
+    /* ✅ 마우스를 올렸을 때, 클릭했을 때, 포커스했을 때 */
+    .page-btn:hover,
+    .page-btn:focus,
+    .page-btn:focus-visible,
+    .page-btn:active {
+    background-color: #E0E2E8 !important;
+    border-color: #D5D7DC !important;
+    color: #1d1d1d !important;
+    box-shadow: 0 0 0 0.15rem rgba(105, 0, 184, 0.15) !important;
+    outline: none !important;
+    }
+
+    /* ✅ 현재 활성 페이지 버튼 (보라색) */
+    .page-btn.active {
+    background: #6900B8 !important;
+    color: #fff !important;
+    border-color: #6900B8 !important;
+    }
+
+
+    /* 12) 좋아요 버튼 컨테이너 스타일 */
+    .like-button-container {
+        margin-top: 0 !important;
+        display: inline-block;
+    }
+
+    /* 13) 좋아요 버튼 스타일 */
+    .like-button-container .like-paper {
+        font-size: 16px !important;
+        padding: 8px 15px !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* ✅ 탭 버튼 스타일 */
+    /* 기존 Bootstrap nav-link에 새로운 스타일 덮어쓰기 */
+.nav-tabs .nav-link {
+    font-size: 20px;    /* 기본 사이즈 (16px) */
+    border: none;                        /* 기본 테두리 제거 */
+    border-radius: 30px;                 /* 둥글게 (버튼 끝을 라운드로) → 크기 조절 가능 */
+    padding: 20px 150px;                  /* 내부 여백 (세로 10px, 가로 25px) → 크기 조절 핵심 */
+    margin: 0 50px;                       /* 버튼 사이 간격 → 탭 간 간격 */
+    background: #f0f0f5;                 /* 기본 배경색 (연한 회색) */
+    color: #555;                         /* 글자색 (회색 계열) */
+    font-weight: 600;                    /* 글꼴 두께 (bold 아님, 살짝 두껍게) */
+    transition: all 0.3s ease;           /* 애니메이션 (hover 등 변경 시 부드럽게) */
+    position: relative;                 /* 커스텀 요소 삽입 대비 */
+    box-shadow: inset 0 0 0 2px transparent;  /* 내부 그림자 (현재 없음) */
+}
+
+/* 마우스 호버 시 */
+.nav-tabs .nav-link:hover {
+    background: #ba7bee;
+    color: #111;
+}
+
+/* 활성화된 탭 (Bootstrap에서 자동으로 .active 클래스 붙음) */
+.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #6c1bee, #b13bf5);
+    color: white;
+    box-shadow: 0 4px 14px rgba(123, 47, 247, 0.3);
+}
+
+/* 탭 바 자체 꾸미기 */
+.nav-tabs {
+    border: none !important;
+    background: #f9f9fc;
+    padding: 8px 12px;
+    border-radius: 50px;
+    display: inline-flex;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+}
+/* ==========================
+   [메타 라인 + pill 태그 (논문 상세와 통일)]
+   ========================== */
+
+/* ------- 상단 저자 정보 라벨(굵고 큰 회색 라벨) ------- */
+/* 기존 .meta-label 로 되어있던 20px/그림자 스타일을 detail-label 로 변경 */
+.detail-label{
+  font-weight: 900;
+  font-size: 20px;
+  color: rgb(92, 91, 91);
+  text-shadow: 1px 1px 2px gray;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+/* 상단 pill(소속/국가/주요분야/키워드) */
+.meta-pill, .keyword-tag{
+  display:inline-block; padding:6px 12px; border-radius:999px;
+  background:#f8f2ff; color:#9b59b6; font-weight:600; font-size:15px;
+  border:1px solid #e4d2ff; text-decoration:none; transition:all .25s ease;
+}
+.meta-pill:hover, .keyword-tag:hover{
+  background:#9b59b6; color:#fff; border-color:#9b59b6;
+  transform:translateY(-1px); box-shadow:0 4px 10px rgba(155,89,182,.25);
+}
+.meta-pill .dot{ width:8px; height:8px; border-radius:50%; background:#3FB3FF; display:inline-block; margin-right:6px; }
+.keyword-container{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+
+/* ==========================
+   [버튼 통합 디자인 - 논문 상세와 동일]
+   ========================== */
+.button-group { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+
+/* 공통 베이스 */
+.btn-unified{
+  display:inline-flex; align-items:center; gap:8px;
+  font-weight:700; font-size:15px; border-radius:12px;
+  padding:10px 18px; transition:all .25s ease;
+  box-shadow:0 3px 10px rgba(105,0,184,.1);
+  background:#fff; border:2px solid transparent; letter-spacing:-0.2px;
+}
+.btn-unified i{ font-size:15px; }
+
+/* 좋아요: 레드 버전 */
+.btn-like{
+  border-color:#f8c8c8;
+  background:linear-gradient(135deg,#fff6f6,#ffecec);
+  color:#d93030;
+}
+.btn-like:hover{
+  background:linear-gradient(135deg,#ffd6d6,#ffbdbd);
+  color:#b91c1c; border-color:#f5aaaa;
+  box-shadow:0 4px 12px rgba(217,48,48,.35);
+  transform:translateY(-2px);
+}
+.btn-like.active{
+  background:linear-gradient(135deg,#ff4b4b,#d93030);
+  color:#fff; border-color:#d93030;
+  box-shadow:0 4px 14px rgba(217,48,48,.45);
+}
+
+/* PDF */
+.btn-pdf{
+  border-color:#D1C4E9; background:#fff; color:#333;
+}
+.btn-pdf:hover{
+  background:#F3E5F5; border-color:#B39DDB; color:#4A148C;
+  box-shadow:0 4px 12px rgba(105,0,184,.2);
+  transform:translateY(-2px);
+}/* ==========================
+   연관 논문 리스트 레이아웃 고정
+   ========================== */
+/* 기본 상태: 회색 (#444~#555) */
+.meta-authors a {
+  color: #555 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+}
+
+/* 호버 시: 짙은 보라색 포인트 */
+.meta-authors a:hover {
+  color: #6900B8 !important;
+  text-decoration: underline;
+}
+/* 부모가 .text-center 여도 리스트/카드는 좌정렬 유지 */
+.related-list,
+.related-list * {
+  text-align: left !important;     /* ✅ 강제 좌정렬 */
+}
+
+/* 리스트: 세로 스택 + 자식 폭 100% 확장 */
+.related-list{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;            /* ✅ 카드 가로 100% */
+  gap: 10px;
+  padding: 0;
+}
+
+/* 카드: 논문 상세와 동일 — 항상 100% 폭 */
+.paper-card{
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;   /* 체크박스 | 본문 | 우측메타(있을 때) */
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #EEE8F8;
+  border-radius: 14px;
+  background: #fff;
+  transition: box-shadow .2s ease, transform .06s ease, background .2s ease;
+}
+.paper-card:hover{
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(105,0,184,.12);
+  transform: translateY(-1px);
+}
+
+/* 체크박스 열 정렬 */
+.paper-card .check-col{ display:flex; align-items:center; justify-content:center; }
+
+/* ==========================
+   타이포 리셋 + 메타 라인 스타일
+   ========================== */
+.paper-card, .paper-card *{
+  font-family: inherit !important;   /* ✅ 이상한 폰트 상속 차단 */
+  font-style: normal !important;     /* ✅ 기울임 방지 */
+  letter-spacing: normal;
+}
+
+.paper-card .body-col{
+  display:flex; flex-direction:column; gap:6px;
+}
+
+/* 제목 */
+.paper-card .paper-title{
+  margin:0; font-weight:700; font-size:16px; line-height:1.35; color:#1D1D1D;
+}
+.paper-card .paper-title a{ color:inherit; text-decoration:none; }
+.paper-card .paper-title a:hover{ color:#6900B8; text-decoration:underline; }
+
+/* 메타 한 줄(저자/키워드/파트·연도) */
+.meta-line{ display:block; font-size:14px; color:#333; line-height:1.4; }
+.meta-label{ font-weight:700; color:#4C4C4C; margin-right:6px; }
+
+/* 키워드 pill — 논문 상세와 동일 톤 */
+.tag{
+  display:inline-block; padding:4px 8px;
+  border:1px solid #E0D5F4; border-radius:8px;
+  background:#F8F5FF; color:#4A2C7F; font-size:12px; line-height:1;
+  margin-right:6px; margin-bottom:4px;
+}
+
+/* 파트 | 연도 구분자 */
+.meta-partyear .sep{ display:inline-block; margin:0 10px; color:#B7A9D8; font-weight:600; }
+
+/* 우측 메타(있을 때만) */
+.right-col{
+  display:flex; flex-direction:column; gap:10px;
+  justify-content:center; align-items:flex-end; min-width:120px;
+}
+
+/* 반응형: 우측 메타를 아래로 */
+@media (max-width: 768px){
+  .paper-card{ grid-template-columns:28px 1fr; }
+  .right-col{ grid-column:1 / -1; align-items:flex-start; flex-direction:row; gap:8px; }
+}
+
+/* 카드/리스트 쪽은 작은 라벨 */
+.meta-line{ display:block; font-size:14px; color:#333; line-height:1.4; }
+.meta-label{ font-weight:700; color:#4C4C4C; margin-right:6px; }
+
+/* 카드 내부는 어떤 상위 text-center 영향에도 좌정렬/일반 폰트 유지 */
+.paper-card, .paper-card *{
+  text-align: left !important;
+  font-family: inherit !important;
+  font-style: normal !important;
+  letter-spacing: normal;
+}
+
+/* 키워드 pill(카드) */
+.tag{
+  display:inline-block; padding:4px 8px; border:1px solid #E0D5F4; border-radius:8px;
+  background:#F8F5FF; color:#4A2C7F; font-size:12px; line-height:1;
+  margin-right:6px; margin-bottom:4px;
+}
+/* 5) 좌측 체크박스 칼럼 (시각 정렬) */
+.paper-card .check-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.paper-card .check-col .form-check-input {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  border-color: #CBB6EE;
+}
+.paper-card .check-col .form-check-input:checked {
+  background-color: #6900B8;
+  border-color: #6900B8;
+}
+/* ==========================
+   헤더 컴팩트 + 브레드크럼 호버 효과
+   ========================== */
+
+/* 1) 헤더 높이 축소(컴팩트) */
+.hero-compact {
+  /* 상하 패딩 축소: 기존 py-5(약 3rem) → 1.75rem로 축소 */
+  padding-block: 1.75rem !important;
+}
+
+/* 반응형에서 조금만 키움 */
+@media (min-width: 992px) {
+  .hero-compact { padding-block: 2.25rem !important; }
+}
+
+/* 2) 제목 여백/크기 살짝 줄이기 */
+.hero-compact .page-title {
+  margin-bottom: 0.6rem;   /* 제목-브레드크럼 간격 축소 */
+  line-height: 1.2;
+}
+
+/* 3) 브레드크럼 카드 자체도 슬림하게 */
+.crumb-card {
+  padding: 6px 10px !important;   /* 카드 안쪽 여백 축소 */
+  border-radius: 10px;
+}
+
+/* 4) 링크에 호버 효과 (부드러운 하이라이트 + 살짝 떠오름) */
+.crumb-link {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: #ffffff;                /* 기본 흰색 */
+  text-decoration: none;
+  transition: all .25s ease;
+}
+.crumb-link:hover,
+.crumb-link:focus {
+  background: rgba(255,255,255,0.22);
+  color: #6900B8 !important;     /* 💜 연보라 텍스트 */
+  box-shadow: 0 2px 8px rgba(105,0,184,0.25);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* 5) 마지막 활성 항목은 약간 흐리게 유지 */
+.breadcrumb-item.active {
+  color: #fff !important;
+  opacity: .85;
+  font-weight: 700;
+}
+
+
+
+/* === 정량적 분석 컨테이너 공통 스타일 === */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.analysis-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #E0D5F4;
+  border-radius: 16px;
+  background: #fff; /* ✅ 내부 흰색으로 변경 */
+  box-shadow: 0 6px 18px rgba(105, 0, 184, 0.08);
+  padding: 14px 16px;
+  height: 380px; /* ✅ 네 박스 모두 동일 높이 */
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+.analysis-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(105, 0, 184, 0.12);
+}
+
+.analysis-box h4 {
+  text-align: center;
+  font-weight: 800;
+  font-size: 18px;
+  color: #1D1D1D;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+
+/* ✅ 내부 그래프 영역 (캔버스/워드클라우드/D3) 꽉 차게 */
+.analysis-body {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ✅ 그래프 캔버스/워드클라우드 모두 박스에 맞게 100% */
+.analysis-body canvas,
+.analysis-body svg {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  display: block;
+}
+
+
+/* ===== Network Chart(공동 저자 관계도) — 통일 테마 ===== */
+.nc-root { width: 100%; height: 100%; display: block; }
+
+.nc-bg {
+  fill: url(#ncBgGrad);
+}
+
+.nc-link {
+  stroke: rgba(105,0,184,.35);         /* 보라 계열 라인 */
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: .9;
+  transition: stroke .2s ease, opacity .2s ease;
+}
+
+.nc-link:hover {
+  stroke: rgba(105,0,184,.55);
+  opacity: 1;
+}
+
+.nc-node circle {
+  fill: #7C4DFF;                       /* 보라 계열 기본 */
+  stroke: #EDE7F6;                     /* 아주 옅은 보라 테두리 */
+  stroke-width: 2;
+  filter: drop-shadow(0 4px 10px rgba(105,0,184,.18));
+  transition: transform .15s ease;
+}
+
+.nc-node circle:hover { transform: scale(1.06); }
+
+.nc-node--main rect {
+  fill: url(#ncMainGrad);              /* 메인 저자: 보라 그라데이션 pill */
+  stroke: #FFFFFF;
+  stroke-width: 2;
+  rx: 12; ry: 12;
+  filter: drop-shadow(0 6px 14px rgba(105,0,184,.22));
+}
+
+.nc-label {
+  font-size: 13px;
+  font-weight: 600;
+  fill: #333;
+  paint-order: stroke;
+  stroke: #fff; stroke-width: 3px;     /* 흰 외곽선으로 가독성↑ */
+}
+
+.nc-label--main { fill: #fff; stroke: rgba(0,0,0,.15); }
+
+.nc-legend {
+  position: absolute;
+  right: 10px; bottom: 10px;
+  background: #fff;
+  border: 1px solid #EEE8F8;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px; color: #444;
+  box-shadow: 0 8px 20px rgba(105,0,184,.08);
+}
+
+/* 분석 카드 내부 여백과 잘 맞도록 */
+#networkChart { width: 100%; height: 100%; }
+
+
+
+
+/* ====== 고정 레이아웃(2 x 2) ====== */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;       /* 2열 */
+  gap: 16px;
+}
+
+/* 반응형(모바일은 1열) */
+@media (max-width: 992px) {
+  .analysis-grid { grid-template-columns: 1fr; }
+}
+
+/* ====== 카드 공통 ====== */
+.qbox {
+  background: #fff;                     /* 내부 흰색 */
+  border: 1px solid #EAE0FF;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(105,0,184,.08);
+}
+
+/* 헤더(보라 그라데이션 바) */
+.qbox-hd{
+  height: 52px;
+  display: flex; align-items: center; justify-content: center; /* ← 가운데 정렬 */
+  padding: 0 16px;
+  font-weight: 800;
+  font-size: 25px;                 /* ← 폰트 키움 */
+  color: #333;                     /* ← 검정 텍스트 */
+  background: #bf8cee;                /* ← 흰 배경 */
+  border-bottom: 1px solid #eee;   /* 보더만 가볍게 */
+  letter-spacing: -0.2px;
+}
+
+/* 본문(고정 높이 컨테이너) */
+:root { --qbox-body-h: 360px; }         /* ▶ 카드 높이: 필요시 320~420px 등으로 조정 */
+.qbox-bd {
+  height: var(--qbox-body-h);
+  padding: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 그래프/워드클라우드가 컨테이너에 딱 맞게 */
+.qbox-bd canvas,
+.qbox-bd svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* 캔버스 가장자리 여백이 답답할 때 살짝 여유 */
+.qbox-bd-inner {
+  width: 100%; height: 100%;
+  padding: 6px 8px 6px 2px;
+}
+
+/* ===== 공동저자 네트워크 전용 스타일 ===== */
+#networkChart {
+  width: 100%;
+  height: 100%;
+  background:#fff;           /* 배경 화이트 */
+  border-radius:12px;        /* 카드와 톤 맞춤 */
+  display:block;
+}
+
+/* 드래그로 화면이 움직이지 않도록(브라우저 기본 드래그/셀렉션 방지) */
+#networkChart, #networkChart * {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 말풍선 툴팁 */
+.nc-tooltip{
+  position: absolute;
+  pointer-events: none;
+  background: rgba(33, 33, 33, .96);
+  color:#fff;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:12px;
+  line-height:1.4;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+  transform: translate(-50%, calc(-100% - 10px));
+  white-space: nowrap;
+  z-index: 9999;
+}
+
+/* 네트워크 차트: 박스 꽉 채우기 + 화이트 배경 */
+#networkChart{
+  width:100%;
+  height:100%;
+  background:#FAFBFE;   /* 아주 옅은 미색 */
+  border-radius:12px;
+  display:block;
+}
+#networkChart, #networkChart *{ user-select:none; -webkit-user-drag:none; }
+
+/* 툴팁 */
+.nc-tooltip{
+  position:absolute; pointer-events:none; background:rgba(33,33,33,.96); color:#fff;
+  padding:8px 10px; border-radius:8px; font-size:12px; line-height:1.4;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+  transform:translate(-50%, calc(-100% - 10px));
+  white-space:nowrap; z-index:9999;
+}
+
+/* 호버 상태(자식 노드) */
+.node-hover circle{ stroke:#6D28D9 !important; stroke-width:2.5 !important; }
+.link-hover{ stroke-width: calc(var(--w,2) + 1.5px) !important; opacity:1 !important; }
+
+/* 네트워크(태양계) 툴팁 */
+  .nc-tooltip{
+    position: absolute; z-index: 10000;
+    padding: 8px 10px; border-radius: 10px;
+    background: #111; color:#fff; font-size:12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    pointer-events:none; white-space: nowrap;
+  }
+  /* 호버 강조 */
+  #networkChart .node-hover circle { filter: drop-shadow(0 6px 10px rgba(105,0,184,.25)); }
+  #networkChart .link-hover { stroke: #333 !important; }
+  /* 희미한 궤도(orbit) */
+  #networkChart .orbit { stroke:#E9E2FF; stroke-width:1.2; fill:none; }
+
+
+
+/* 정성적 분석 바깥 컨테이너(초록 → 회색, 자동 높이) */
+.analysis-shell{
+  border:1px solid #E5E7EB;   /* 회색 테두리 (tailwind gray-200) */
+  background:#F9FAFB;         /* 아주 옅은 회색 배경 */
+  border-radius:12px;
+  padding:16px;
+}
+
+/* 실제 결과 박스(내용 길이에 맞추고 너무 길면 화면 72vh까지만 스크롤) */
+.analysis-box{
+  min-height:220px;     /* 내용이 짧을 땐 최소 높이만 보장 */
+  height:auto;          /* 자동으로 늘어남 */
+  max-height:72vh;      /* 너무 길면 화면 높이의 72%까지만 커지고 내부 스크롤 */
+  overflow-y:auto;
+  background:#fff;
+  border:1px solid #E5E7EB;
+  border-radius:10px;
+  padding:16px;
+}
+
+/* 좁은 화면에서 조금 더 낮게 제한 */
+@media (max-width: 768px){
+  .analysis-box{ max-height:64vh; }
+}

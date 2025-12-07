@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'css/part_paper.css' %}?v=1">
+
+<div class="container" style="margin-top:190px">
+  <div class="mt-5 left-align-container">
+    <!-- 파트 선택 -->
+    <div class="dropdown">
+      <button
+        class="btn btn-light dropdown-toggle text-dark fw-bold"
+        type="button"
+        id="partDropdown"
+        data-bs-toggle="dropdown"
+        data-bs-display="static"           
+        aria-expanded="false"
+        style="font-size:18px;">
+        주제별 논문
+      </button>
+      <ul class="dropdown-menu shadow-sm" aria-labelledby="partDropdown" style="max-height:280px; overflow-y:auto; width:250px;">
+        {% for part in parts %}
+          <li><a class="dropdown-item part-btn text-dark fw-bold" href="#" data-part-id="{{ part.id }}">{{ part.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- 제목 + 검색바 (고정) -->
+    <div class="d-flex align-items-center justify-content-between mt-3" style="margin-left:-15px;">
+      <h3 class="list-title mb-0" id="listTitle" style="color:#000000;">
+        <span id="partTitle">논문 목록</span>
+        <span id="totalCount" style="color:#6900B8; font-weight:bold; font-size:18px; margin-left:8px;">(0건)</span>
+      </h3>
+
+      <div class="input-group" style="max-width: 360px;">
+        <input id="partSearchInput" type="text" class="form-control" placeholder="제목 검색" value="">
+      </div>
+    </div>
+
+    <!-- 표 (thead는 고정, tbody만 갱신) -->
+    <table class="table table-bordered" style="margin-left:-15px; margin-top:12px;">
+      <thead class="table-header">
+        <tr>
+          <th style="width:100%; text-align:left; font-size:20px; font-weight:bold; padding:7px;">제목</th>
+        </tr>
+      </thead>
+      <tbody id="paperList">
+        <tr><td class="text-muted">주제를 선택하세요.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div id="paginationControls" class="mt-3"></div>
+  </div>
+</div>
+
+<!-- Bootstrap (bundle 포함) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ====== 드롭다운 확실히 열리도록 명시 초기화 + 토글 바인딩 ======
+  const ddBtn = document.getElementById('partDropdown');
+  const dd    = new bootstrap.Dropdown(ddBtn, {
+    popperConfig: { strategy: 'fixed' }  // ✅ 부모 transform/overflow 영향 최소화
+  });
+  ddBtn.addEventListener('click', (e) => { e.preventDefault(); dd.toggle(); });
+  document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(a => {
+    a.addEventListener('click', () => dd.hide());
+  });
+  // ===============================================================
+
+  const partButtons = document.querySelectorAll('.part-btn');
+  const partDropdownButton = ddBtn;
+
+  const partTitle = document.getElementById('partTitle');
+  const totalCountEl = document.getElementById('totalCount');
+  const paperList = document.getElementById('paperList');
+  const paginationControls = document.getElementById('paginationControls');
+  const searchInput = document.getElementById('partSearchInput');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  let selectedPartId = urlParams.get('part_id');
+  let selectedPartName = urlParams.get('part_name');
+  let currentPage = parseInt(urlParams.get('page') || '1', 10);
+  let currentQuery = urlParams.get('q') || '';
+  let inFlightController = null;
+  let composing = false; // IME 조합 상태
+
+  if (selectedPartId && selectedPartName) {
+    partDropdownButton.textContent = selectedPartName;
+    partTitle.textContent = `${selectedPartName} 논문 목록`;
+    searchInput.value = currentQuery;
+    loadPartPapers(selectedPartId, selectedPartName, currentPage, currentQuery);
+  } else {
+    paperList.innerHTML = `<tr><td class="text-muted">주제를 선택하세요.</td></tr>`;
+  }
+
+  partButtons.forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      selectedPartId = this.getAttribute('data-part-id');
+      selectedPartName = this.textContent.trim();
+      currentPage = 1;
+      currentQuery = '';
+      partDropdownButton.textContent = selectedPartName;
+      partTitle.textContent = `${selectedPartName} 논문 목록`;
+      searchInput.value = '';
+
+      const next = new URL(window.location);
+      next.searchParams.set('part_id', selectedPartId);
+      next.searchParams.set('part_name', selectedPartName);
+      next.searchParams.set('page', currentPage);
+      next.searchParams.delete('q');
+      window.history.replaceState({}, '', next);
+
+      loadPartPapers(selectedPartId, selectedPartName, currentPage, currentQuery);
+    });
+  });
+
+  // HTML 이스케이프 유틸
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  // 정규식 특수문자 이스케이프
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // 서버 호출 (표/건수/페이지네이션만 갱신)
+  function loadPartPapers(partId, partName, page=1, q='') {
+    if (!partId) return;
+
+    if (inFlightController) inFlightController.abort();
+    inFlightController = new AbortController();
+
+    paperList.innerHTML = `
+      <tr>
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            <span class="text-muted">불러오는 중...</span>
+          </div>
+        </td>
+      </tr>`;
+
+    fetch(`/get_papers_by_part/${partId}/?page=${page}&page_size=20&q=${encodeURIComponent(q)}`, {
+      signal: inFlightController.signal
+    })
+      .then(r => r.json())
+      .then(data => {
+        currentQuery = data.q || '';
+
+        // 건수 업데이트
+        totalCountEl.textContent = `(${data.total_count}건)`;
+
+        // tbody 업데이트
+        let rows = '';
+        if (data.papers.length > 0) {
+          const globalStartIdx = (data.page - 1) * data.page_size;
+          data.papers.forEach((p, i) => {
+            let safeTitle = escapeHtml(p.title);
+            if (currentQuery) {
+              const pattern = new RegExp(`(${escapeRegExp(currentQuery)})`, 'gi');
+              safeTitle = safeTitle.replace(pattern, '<span class="hl">$1</span>');
+            }
+            rows += `
+              <tr>
+                <td style="font-size:17px; font-weight:bold; padding:8px;">
+                  <a href="/paper/${p.id}/" class="text-link">
+                    ${globalStartIdx + i + 1}. ${safeTitle}
+                  </a>
+                </td>
+              </tr>`;
+          });
+        } else {
+          rows = `<tr><td class="text-muted text-center">검색 결과가 없습니다.</td></tr>`;
+        }
+        paperList.innerHTML = rows;
+
+        // 페이지네이션
+        renderPagination(data, partId, partName);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        paperList.innerHTML = `<tr><td class="text-danger">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+      });
+  }
+
+  // 디바운스
+  function debounce(fn, delay=350) {
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); };
+  }
+
+  // 실시간 검색 (IME 안전)
+  const liveSearch = debounce(() => {
+    if (!selectedPartId) return;
+    if (composing) return;
+
+    currentQuery = (searchInput.value || '').trim();
+    currentPage = 1;
+
+    const next = new URL(window.location);
+    next.searchParams.set('part_id', selectedPartId);
+    next.searchParams.set('part_name', selectedPartName || '');
+    next.searchParams.set('page', currentPage);
+    if (currentQuery) next.searchParams.set('q', currentQuery); else next.searchParams.delete('q');
+    window.history.replaceState({}, '', next);
+
+    loadPartPapers(selectedPartId, selectedPartName, currentPage, currentQuery);
+  }, 350);
+
+  // IME 조합 상태 처리
+  searchInput.addEventListener('compositionstart', () => { composing = true; });
+  searchInput.addEventListener('compositionend', () => {
+    composing = false;
+    liveSearch(); // 조합 종료 시 1회 실행
+  });
+  searchInput.addEventListener('input', () => {
+    if (!composing) liveSearch();
+  });
+
+  function renderPagination(data, partId, partName) {
+    if (data.total_pages <= 1) {
+      paginationControls.innerHTML = '';
+      return;
+    }
+    const maxButtons = 7;
+    const half = Math.floor(maxButtons / 2);
+    let start = Math.max(1, data.page - half);
+    let end = Math.min(data.total_pages, start + maxButtons - 1);
+    if (end - start + 1 < maxButtons) start = Math.max(1, end - maxButtons + 1);
+
+    let html = `<div class="pagination">`;
+    html += `<button class="page-btn" ${data.has_prev ? '' : 'disabled'} data-page="1">« 처음</button>`;
+    html += `<button class="page-btn" ${data.has_prev ? '' : 'disabled'} data-page="${data.page - 1}">‹ 이전</button>`;
+    for (let p = start; p <= end; p++) {
+      html += `<button class="page-btn ${p === data.page ? 'active' : ''}" data-page="${p}">${p}</button>`;
+    }
+    html += `<button class="page-btn" ${data.has_next ? '' : 'disabled'} data-page="${data.page + 1}">다음 ›</button>`;
+    html += `<button class="page-btn" ${data.has_next ? '' : 'disabled'} data-page="${data.total_pages}">마지막 »</button>`;
+    html += `</div>`;
+
+    paginationControls.innerHTML = html;
+
+    paginationControls.querySelectorAll('.page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const goto = parseInt(btn.getAttribute('data-page'), 10);
+        if (!isNaN(goto) && goto >= 1 && goto <= data.total_pages && goto !== data.page) {
+          currentPage = goto;
+
+          const next = new URL(window.location);
+          next.searchParams.set('part_id', partId);
+          next.searchParams.set('part_name', partName);
+          next.searchParams.set('page', currentPage);
+          if (currentQuery) next.searchParams.set('q', currentQuery); else next.searchParams.delete('q');
+          window.history.replaceState({}, '', next);
+
+          loadPartPapers(partId, partName, currentPage, currentQuery);
+        }
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

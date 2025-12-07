@@ -1,0 +1,635 @@
+
+/*** Spinner Start ***/
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .8s ease-out, visibility 0s linear .5s;
+    z-index: 99999;
+ }
+
+ #spinner.show {
+     transition: opacity .8s ease-out, visibility 0s linear .0s;
+     visibility: visible;
+     opacity: 1;
+ }
+
+/* ✅ Back to Top - 연한 보라톤 스타일 */
+.back-to-top {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  background-color: #BFA2E6 !important;  /* 💜 연한 보라색 */
+  border: 2px solid #BFA2E6 !important;
+  border-radius: 50%;
+  color: #fff !important;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(105, 0, 184, 0.25);
+}
+
+/* ✅ hover 시 진보라색으로 전환 */
+.back-to-top:hover {
+  background-color: #6900B8 !important;  /* 💜 진보라 */
+  border-color: #6900B8 !important;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(105, 0, 184, 0.35);
+}
+
+/* 아이콘 중앙 정렬 + 살짝 큼 */
+.back-to-top i {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/*** Spinner End ***/
+
+
+/*** Button Start ***/
+.btn {
+    font-weight: 600;
+    transition: .5s;
+}
+
+.btn-square {
+    width: 32px;
+    height: 32px;
+}
+
+.btn-sm-square {
+    width: 34px;
+    height: 34px;
+}
+
+.btn-md-square {
+    width: 44px;
+    height: 44px;
+}
+
+.btn-lg-square {
+    width: 56px;
+    height: 56px;
+}
+
+.btn-square,
+.btn-sm-square,
+.btn-md-square,
+.btn-lg-square {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+}
+
+.btn.border-secondary {
+    transition: 0.5s;
+}
+
+.btn.border-secondary:hover {
+    background: var(--bs-secondary) !important;
+    color: var(--bs-white) !important;
+}
+
+/*** Topbar Start ***/
+.fixed-top {
+    transition: 0.5s;
+    background: var(--bs-white);
+    border: 0;
+}
+
+.topbar {
+    padding: 20px;
+    border-radius: 230px 100px;
+}
+
+.topbar .top-info {
+    font-size: 15px;
+    line-height: 0;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.topbar .top-link {
+    font-size: 15px;
+    line-height: 0;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.topbar .top-link a {
+    letter-spacing: 1px;
+}
+
+.topbar .top-link a small:hover {
+    color: var(--bs-secondary) !important;
+    transition: 0.5s;
+}
+
+.topbar .top-link a small:hover i {
+    color: var(--bs-primary) !important;
+}
+/*** Topbar End ***/
+
+/*** Navbar Start ***/
+.navbar .navbar-nav .nav-link {
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: .5s;
+}
+
+.navbar {
+    height: 100px;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link.active,
+.fixed-top.bg-white .navbar .navbar-nav .nav-link:hover,
+.fixed-top.bg-white .navbar .navbar-nav .nav-link.active {
+    color: var(--bs-primary);
+}
+
+.navbar .dropdown-toggle::after {
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+@media (min-width: 1200px) {
+    .navbar .nav-item .dropdown-menu {
+        display: block;
+        visibility: hidden;
+        top: 100%;
+        transform: rotateX(-75deg);
+        transform-origin: 0% 0%;
+        border: 0;
+        transition: .5s;
+        opacity: 0;
+    }
+}
+
+.dropdown .dropdown-menu a:hover {
+    background: var(--bs-secondary);
+    color: var(--bs-primary);
+}
+
+.navbar .nav-item:hover .dropdown-menu {
+    transform: rotateX(0deg);
+    visibility: visible;
+    background: var(--bs-light) !important;
+    border-radius: 10px !important;
+    transition: .5s;
+    opacity: 1;
+}
+
+#searchModal .modal-content {
+    background: rgba(255, 255, 255, .8);
+}
+/*** Navbar End ***/
+
+/*** Hero Header ***/
+.hero-header {
+    background: 
+        linear-gradient(
+            to bottom, 
+            rgba(255, 255, 250, 0.2) 0%, 
+            rgba(207, 199, 240, 0.9) 40%, 
+            rgba(207, 199, 240, 0.9) 60%, 
+            rgba(255, 255, 250, 0.2) 100%
+        ),
+        url('../img/cubes.png');
+    background-repeat: repeat;
+    background-size: auto;
+}
+
+/* .hero-header {
+    background: 
+        linear-gradient(rgba(255, 255, 250, 0.5), rgba(207, 199, 240, 0.7)),
+        url('../img/cubes.png');
+    background-repeat: repeat;
+    background-size: auto;
+} */
+
+.carousel-item {
+    position: relative;
+}
+
+.carousel-item a {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 25px;
+    background: linear-gradient(rgba(255, 181, 36, 0.7), rgba(255, 181, 36, 0.7));
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+    width: 48px;
+    height: 48px;
+    border-radius: 48px;
+    border: 1px solid var(--bs-white);
+    background: var(--bs-primary);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.carousel-control-next {
+    margin-right: 20px;
+}
+
+.carousel-control-prev {
+    margin-left: 20px;
+}
+
+.page-header {
+    position: relative;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(../img/detail_page.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+@media (min-width: 992px) {
+    .hero-header,
+    .page-header {
+        margin-top: 152px !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-header,
+    .page-header {
+        margin-top: 97px !important;
+    }
+}
+/*** Hero Header end ***/
+
+
+/*** featurs Start ***/
+.featurs .featurs-item .featurs-icon {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.featurs .featurs-item .featurs-icon::after {
+    content: "";
+    width: 35px;
+    height: 35px;
+    background: var(--bs-secondary);
+    position: absolute;
+    bottom: -10px;
+    transform: translate(-50%);
+    transform: rotate(45deg);
+    background: var(--bs-secondary);
+    
+}
+/*** featurs End ***/
+
+
+/*** service Start ***/
+.service .service-item .service-content {
+    position: relative;
+    width: 250px; 
+    height: 130px; 
+    top: -50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+}
+
+/*** service End ***/
+
+
+/*** Fruits Start ***/
+.fruite .tab-class .nav-item a.active {
+    background: var(--bs-secondary) !important;
+}
+
+.fruite .tab-class .nav-item a.active span {
+    color: var(--bs-white) !important; 
+}
+
+.fruite .fruite-categorie .fruite-name {
+    line-height: 40px;
+}
+
+.fruite .fruite-categorie .fruite-name a {
+    transition: 0.5s;
+}
+
+.fruite .fruite-categorie .fruite-name a:hover {
+    color: var(--bs-secondary);
+}
+
+.fruite .fruite-item {
+    height: 100%;
+    transition: 0.5s;
+}
+.fruite .fruite-item:hover {
+    box-shadow: 0 0 55px rgba(0, 0, 0, 0.4);
+}
+
+.fruite .fruite-item .fruite-img {
+    overflow: hidden;
+    transition: 0.5s;
+    border-radius: 10px 10px 0 0;
+}
+
+.fruite .fruite-item .fruite-img img {
+    transition: 0.5s;
+}
+
+.fruite .fruite-item .fruite-img img:hover {
+    transform: scale(1.3);
+}
+/*** Fruits End ***/
+
+
+/*** vesitable Start ***/
+.vesitable .vesitable-item {
+    height: 100%;
+    transition: 0.5s;
+}
+
+.vesitable .vesitable-item:hover {
+    box-shadow: 0 0 55px rgba(0, 0, 0, 0.4);
+}
+
+.vesitable .vesitable-item .vesitable-img {
+    overflow: hidden;
+    transition: 0.5s;
+    border-radius: 10px 10px 0 0;
+}
+
+.vesitable .vesitable-item .vesitable-img img {
+    transition: 0.5s;
+}
+
+.vesitable .vesitable-item .vesitable-img img:hover {
+    transform: scale(1.2);
+}
+
+.vesitable .owl-stage {
+    margin: 50px 0;
+    position: relative;
+}
+
+.vesitable .owl-nav .owl-prev {
+    position: absolute;
+    top: -8px;
+    right: 0;
+    color: var(--bs-primary);
+    padding: 5px 25px;
+    border: 1px solid var(--bs-secondary);
+    border-radius: 20px;
+    transition: 0.5s;
+
+}
+
+.vesitable .owl-nav .owl-prev:hover {
+    background: var(--bs-secondary);
+    color: var(--bs-white);
+}
+
+.vesitable .owl-nav .owl-next {
+    position: absolute;
+    top: -8px;
+    right: 88px;
+    color: var(--bs-primary);
+    padding: 5px 25px;
+    border: 1px solid var(--bs-secondary);
+    border-radius: 20px;
+    transition: 0.5s;
+}
+
+.vesitable .owl-nav .owl-next:hover {
+    background: var(--bs-secondary);
+    color: var(--bs-white);
+}
+/*** vesitable End ***/
+
+
+/*** Banner Section Start ***/
+.banner .banner-btn:hover {
+    background: var(--bs-primary);
+}
+/*** Banner Section End ***/
+
+
+/*** Facts Start ***/
+.counter {
+    height: 100%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+}
+
+.counter i {
+    font-size: 60px;
+    margin-bottom: 25px;
+}
+
+.counter h4 {
+    color: var(--bs-primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.counter h1 {
+    margin-bottom: 0;
+}
+/*** Facts End ***/
+
+
+/*** testimonial Start ***/
+.testimonial .owl-nav .owl-prev {
+    position: absolute;
+    top: -58px;
+    right: 0;
+    color: var(--bs-primary);
+    padding: 5px 25px;
+    border: 1px solid var(--bs-secondary);
+    border-radius: 20px;
+    transition: 0.5s;
+}
+
+.testimonial .owl-nav .owl-prev:hover {
+    background: var(--bs-secondary);
+    color: var(--bs-white);
+}
+
+.testimonial .owl-nav .owl-next {
+    position: absolute;
+    top: -58px;
+    right: 88px;
+    color: var(--bs-primary);
+    padding: 5px 25px;
+    border: 1px solid var(--bs-secondary);
+    border-radius: 20px;
+    transition: 0.5s;
+}
+
+.testimonial .owl-nav .owl-next:hover {
+    background: var(--bs-secondary);
+    color: var(--bs-white);
+}
+/*** testimonial End ***/
+
+
+/*** Single Page Start ***/
+.pagination {
+    display: inline-block;
+}
+  
+.pagination a {
+    color: var(--bs-dark);
+    padding: 10px 16px;
+    text-decoration: none;
+    transition: 0.5s;
+    border: 1px solid var(--bs-secondary);
+    margin: 0 4px;
+}
+  
+.pagination a.active {
+    background-color: var(--bs-primary);
+    color: var(--bs-light);
+    border: 1px solid var(--bs-secondary);
+}
+  
+.pagination a:hover:not(.active) {background-color: var(--bs-primary)}
+
+.nav.nav-tabs .nav-link.active {
+    border-bottom: 2px solid var(--bs-secondary) !important;
+}
+/*** Single Page End ***/
+
+
+/*** Footer Start ***/
+.footer .footer-item .btn-link {
+    line-height: 35px;
+    color: rgba(255, 255, 255, .5);
+    transition: 0.5s;
+}
+
+.footer .footer-item .btn-link:hover {
+    color: var(--bs-secondary) !important;
+}
+
+.footer .footer-item p.mb-4 {
+    line-height: 35px;
+}
+/*** Footer End ***/
+
+/* 공통 카드: 애니메이션/호버 제거 + 동일 높이/패딩 */
+.hero-header .border.rounded.p-4.bg-light{
+  background:#fff !important;
+  border:none !important;
+  border-radius:20px !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.08) !important;
+  height:330px !important;               /* 두 카드 높이 동일 */
+  padding:24px 26px !important;
+  transition:none !important;            /* ✅ 애니메이션 제거 */
+}
+.hero-header .border.rounded.p-4.bg-light:hover{
+  transform:none !important;             /* ✅ 호버 이동 제거 */
+  box-shadow:0 6px 16px rgba(0,0,0,.08) !important;
+}
+
+/* === 인기 키워드 / 인기 자료 제목 정렬 보정 === */
+.hero-header h5 {
+  position: relative;
+  display: block;
+  margin: 0 0 10px 0;        /* 🔹 아래 여백 줄이기 (기존 14px → 10px) */
+  padding-bottom: 4px;       /* 🔹 내부 여백 줄이기 (기존 8px → 4px) */
+  line-height: 1.2;          /* 🔹 제목 글씨 높이 줄이기 */
+  color: #111 !important;
+  font-weight: 700;
+}
+
+/* === 보라색 라인 위치 조정 === */
+.hero-header h5::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;              /* 🔹 라인을 살짝 위로 올림 */
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6900B8 0%, #9a62dc 70%, rgba(255,255,255,0) 100%);
+}
+
+
+/* 리스트 라인/간격을 두 카드에서 동일하게 */
+.hero-header .list-unstyled{
+  margin:0; padding:0;
+}
+.hero-header .list-unstyled li{
+  list-style:none;
+  padding:10px 4px;
+  border-bottom:1px solid #e9e9ee;
+}
+.hero-header .list-unstyled li:last-child{
+  border-bottom:none;
+}
+.hero-header .list-unstyled a{
+  color:#111 !important;
+  text-decoration:none !important;
+}
+
+/* '전체보기 +' 버튼: 카드 내 폭/정렬 통일 */
+.hero-header .btn-outline-danger{
+  border-radius:18px !important;
+  border-color:#6900B8 !important;
+  color:#6900B8 !important;
+  font-weight:600 !important;
+  width:100%;
+  margin-top:12px !important;
+  transition:none !important;            /* 애니메이션 제거 */
+}
+.hero-header .btn-outline-danger:hover{
+  background:#6900B8 !important;
+  color:#fff !important;
+}
+
+/* 그 외 혹시 남아있는 전역 호버/트랜지션 제거용(선택) */
+.hero-header *{
+  transition: none !important;
+}
+
+/* ✅ 로그아웃 버튼 - 연한 회색톤 */
+.btn-logout {
+  background-color: #E9E9E9 !important;  /* 🌫 부드러운 회색 */
+  border: 1px solid #D6D6D6 !important;  /* 은은한 테두리 */
+  color: #333 !important;                /* 글씨는 진회색 */
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ✅ hover 시 조금 더 진한 회색 */
+.btn-logout:hover {
+  background-color: #CFCFCF !important;  /* hover 시 중간회색 */
+  border-color: #BDBDBD !important;
+  color: #000 !important;                /* 글씨는 살짝 더 진하게 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+/* ✅ 클릭 시 눌림 효과 */
+.btn-logout:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}

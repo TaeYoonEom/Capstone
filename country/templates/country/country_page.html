@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+
+<link rel="stylesheet" href="{% static 'css/country.css' %}">
+
+<!-- 1) 상단 헤더 영역: 국가명 및 네비게이션 경로 표시 -->
+<div class="container-fluid page-header hero-compact" 
+     style="
+       position: relative;
+       background: linear-gradient(135deg, rgba(105,0,184,0.85) 0%, rgba(180,150,255,0.75) 100%);
+       color: #fff;
+       overflow: hidden;
+       border-bottom: 1px solid rgba(255,255,255,0.2);
+     ">
+
+  <div style="position:absolute; inset:0; backdrop-filter: blur(8px); background: rgba(255,255,255,0.05);"></div>
+
+  <div class="container position-relative text-center" style="z-index:2;">
+    <!-- 페이지 상단 제목(국가명) -->
+    <h1 class="display-6 fw-bold mb-3 page-title" 
+        style="color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,0.25); letter-spacing:-0.3px;">
+      {{ country.name }}
+    </h1>
+
+    <!-- breadcrumb 카드 -->
+    <div class="d-inline-block mt-2 crumb-card"     
+         style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+                border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); backdrop-filter: blur(10px);">
+      <ol class="breadcrumb mb-0" style="background: transparent; font-weight:600; letter-spacing:-0.2px; margin:0;">
+        <li class="breadcrumb-item">
+          <a href="{% url 'main' %}" class="crumb-link">Home</a>   
+        </li>
+        <li class="breadcrumb-item">
+          <a href="javascript:history.back()" class="crumb-link">search page</a>  
+        </li>
+        <li class="breadcrumb-item active">country</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- 2) 메인 컨테이너 시작 -->
+<div class="container-fluid py-2 mt-2">
+    <div class="container py-5">
+        <div class="row g-4 mb-5">
+
+            <!-- 3) 좌측 주요 정보 영역 -->
+            <div class="col-lg-8 col-xl-9">
+                <div class="row g-4">
+                    <div class="col-lg-6"></div>
+
+                    <!-- 4) 국가명, 주요파트, 키워드, 기관, 저자 정보 출력 -->
+                    <div class="col-lg-12 text-start">
+                        <h3 class="fw-bold mb-3" style="font-size: 35px; color: #333; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                            {{ country.name }}
+                        </h3>
+                        <hr class="my-3">
+
+                        <!-- 5) 주요 파트 -->
+                        <p class="mb-3">
+                            <span style="font-weight: 900; font-size: 20px; color: rgb(92, 91, 91); text-shadow: 1px 1px 2px gray;">주요파트:</span>
+                            <span style="font-size: 18px; color: #3e3d3e;">{{main_part}}</span>
+                        </p>
+                        <hr class="my-3">
+
+                        <div class="country-info">
+                            <!-- 6) 주요 키워드 -->
+                            <div class="meta-line">
+                              <span class="meta-label">주요 키워드:</span>
+                              <span class="d-flex align-items-center flex-wrap" style="gap:6px;">
+                                {% for keyword in keywords %}
+                                  <a href="{% url 'keyword_page' keyword_id=keyword.id %}" class="keyword-tag">#{{ keyword.keyword_name }}</a>
+                                {% empty %}
+                                  <span class="keyword-tag" style="opacity:.7;">정보 없음</span>
+                                {% endfor %}
+                              </span>
+                            </div>
+                            <hr class="my-3">
+
+                            <!-- 7) 주요 기관 및 더보기 -->
+                            <div class="meta-line">
+                              <span class="meta-label">주요 기관:</span>
+                              <span class="d-flex align-items-center flex-wrap" style="gap:6px;">
+                                {% if main_affiliation %}
+                                  <a href="{% url 'affiliation_page' affiliation_id=main_affiliation.id %}" class="keyword-tag">#{{ main_affiliation.name }}</a>
+                                {% else %}
+                                  <span class="keyword-tag" style="opacity:.7;">정보 없음</span>
+                                {% endif %}
+                              </span>
+                              {% if all_affiliations|length > 1 %}
+                                <button id="toggleAffiliationsBtn" type="button" class="btn-more ms-2">
+                                  <i class="fas fa-plus"></i> 더보기
+                                </button>
+                              {% endif %}
+                            </div>
+
+                            {% if all_affiliations|length > 1 %}
+                              <div id="allAffiliationsList" style="display:none; margin-top:8px;">
+                                <div class="d-flex align-items-center flex-wrap" style="gap:6px;">
+                                  {% for affiliation in all_affiliations %}
+                                    <a href="{% url 'affiliation_page' affiliation_id=affiliation.id %}" class="keyword-tag">#{{ affiliation.name }}</a>
+                                  {% endfor %}
+                                </div>
+                              </div>
+                            {% endif %}
+                            <hr class="my-3">
+
+                            <!-- 8) 주요 저자 및 더보기 -->
+                            <div class="meta-line">
+                              <span class="meta-label">주요 저자:</span>
+                              <span class="d-flex align-items-center flex-wrap" style="gap:6px;">
+                                {% for author in top_authors %}
+                                  {% if author.id %}
+                                    <a href="{% url 'author_page' author_id=author.id %}" class="keyword-tag">#{{ author.name }}</a>
+                                  {% else %}
+                                    <span class="keyword-tag">#{{ author.name }}</span>
+                                  {% endif %}
+                                {% empty %}
+                                  <span class="keyword-tag" style="opacity:.7;">정보 없음</span>
+                                {% endfor %}
+                              </span>
+
+                              {% if all_authors|length > 5 %}
+                                <button id="toggleAuthorsBtn" type="button" class="btn-more ms-2">
+                                  <i class="fas fa-plus"></i> 더보기
+                                </button>
+                              {% endif %}
+                            </div>
+
+                            {% if all_authors|length > 5 %}
+                              <div id="allAuthorsList" style="display:none; margin-top:8px;">
+                                <div class="d-flex align-items-center flex-wrap" style="gap:6px;">
+                                  {% for author in all_authors %}
+                                    {% if author.id %}
+                                      <a href="{% url 'author_page' author_id=author.id %}" class="keyword-tag">#{{ author.name }}</a>
+                                    {% else %}
+                                      <span class="keyword-tag">#{{ author.name }}</span>
+                                    {% endif %}
+                                  {% endfor %}
+                                </div>
+                              </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- 9) 좋아요 및 PDF 저장 버튼 -->
+                    <hr class="my-3">
+                    <div class="button-group">
+                      <!-- 좋아요 버튼 -->
+                      <button
+                        class="btn-unified btn-like like-country {% if user_liked %}active{% endif %}"
+                        data-country-id="{{ country.id }}">
+                        <i class="fas fa-heart"></i>
+                        좋아요 (<span id="like-count-{{ country.id }}">{{ like_count }}</span>)
+                      </button>
+
+                      <!-- PDF 저장 버튼 -->
+                      <button class="btn-unified btn-pdf ms-2" id="pdfDownload">
+                        <i class="fas fa-file-pdf"></i> PDF 저장
+                      </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10) 우측 통계 요약 정보 박스 -->
+            <div class="col-lg-4 col-xl-3">
+                <div class="row g-4 fruite">
+                    <div class="col-lg-12">
+                        <div class="mb-4">
+                            <h4 class="fw-bold mb-4 " style="color:#333;">📄 국가 상세정보</h4>
+                            <table class="custom-table">
+                                <tbody>
+                                    <tr><th>출판수</th><td>{{ publication_count }}</td></tr>
+                                    <tr><th>총 인용수</th><td>{{ total_citations }}</td></tr>
+                                    <tr><th>평균 인용수</th><td>{{ avg_citations|floatformat:2 }}</td></tr>
+                                    <tr><th>기관 수</th><td>{{ total_affiliations }}</td></tr>
+                                    <tr><th>저자 수</th><td>{{ total_authors }}</td></tr>
+                                    <tr><th>좋아요 수</th><td><span id="total-likes">{{ like_count|default:"0" }}</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+
+        <!-- 11) 정량/정성 분석 탭 영역 -->
+        <div class="container text-center">
+            <div class="container text-center mt-5">
+                <div class="nav nav-tabs mb-4 justify-content-center" id="analysisTab" role="tablist">
+                    <button class="nav-link active" id="quant-tab" data-bs-toggle="tab" data-bs-target="#quant" type="button"
+                            role="tab" aria-controls="quant" aria-selected="true">
+                        정량적 분석
+                    </button>
+                    <button class="nav-link" id="qual-tab" data-bs-toggle="tab" data-bs-target="#qual" type="button"
+                            role="tab" aria-controls="qual" aria-selected="false">
+                        정성적 분석
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content container" id="analysisTabContent">
+                <!-- 정량적 분석 탭 -->
+                <div class="tab-pane fade show active" id="quant" role="tabpanel" aria-labelledby="quant-tab">
+                  <div class="analysis-grid">
+
+                    <!-- 연도별 출판 논문 차트 -->
+                    <section class="qbox">
+                      <div class="qbox-hd">연도별 출판 논문</div>
+                      <div class="qbox-bd">
+                        <div class="qbox-bd-inner">
+                          <canvas id="yearChart"></canvas>
+                        </div>
+                      </div>
+                    </section>
+
+                    <!-- 파트별 논문 차트 -->
+                    <section class="qbox">
+                      <div class="qbox-hd">파트별 논문</div>
+                      <div class="qbox-bd">
+                        <div class="qbox-bd-inner">
+                          <canvas id="partChart"></canvas>
+                        </div>
+                      </div>
+                    </section>
+
+                    <!-- 국가 키워드 워드클라우드 -->
+                    <section class="qbox">
+                      <div class="qbox-hd">국가 키워드</div>
+                      <div class="qbox-bd">
+                        <svg id="country-wordcloud"></svg>
+                      </div>
+                    </section>
+
+                    <!-- 공동 국가 관계도 네트워크 -->
+                    <section class="qbox">
+                      <div class="qbox-hd">공동 국가 관계도</div>
+                      <div class="qbox-bd">
+                        <svg id="networkChart" width="100%" height="100%"></svg>
+                      </div>
+                    </section>
+
+                  </div>
+                </div>
+
+                <!-- 정성적 분석 탭 -->
+                <div class="tab-pane fade" id="qual" role="tabpanel" aria-labelledby="qual-tab">
+                    <div class="analysis-shell rounded p-3" style="background-color:#f3f0ff;">
+
+                        <!-- 정성적 분석 보기 / 로그인 안내 버튼 -->
+                        <div class="d-flex justify-content-center align-items-center mb-3">
+                            {% if user.is_authenticated %}
+                                <button id="analysisToggle" class="btn px-4 py-2"
+                                        style="background-color:#a177db; color:white; font-weight:700;">
+                                    정성적 분석 보기
+                                </button>
+                            {% else %}
+                                <button id="loginRedirect" class="btn px-4 py-2"
+                                        style="background-color:#ee5454; color:white; font-weight:700;">
+                                    로그인 후 사용 가능
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        <!-- 정성 분석 결과 영역 -->
+                        <div id="analysisContent" style="display:none; padding-top:10px;">
+                            <div id="loadingMessage" style="display:none; text-align:center;">
+                                <p>📊 분석 중입니다. 잠시만 기다려 주세요...</p>
+                            </div>
+
+                            <div id="analysisResult"
+                                 style="border:1px solid #ddd; background-color:#ffffff; border-radius:10px; padding:20px;
+                                        max-height:1200px; overflow-y:auto;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12) 논문 목록 + 페이지네이션 -->
+            <div class="container mt-5">
+                <h3 class="mb-3 text-start d-flex align-items-center">
+                    <i class="fas fa-file-alt"></i> 국가별 논문 목록 
+                    <span class="text-muted small ms-2">({{ page_obj.paginator.count }}건)</span>
+
+                    <!-- 내 서재 담기 버튼 -->
+                    <button class="btn btn-outline-dark ms-auto save-selected-papers">
+                        <i class="far fa-bookmark"></i> 내 서재 담기
+                    </button>
+                </h3>
+                <hr class="my-3">
+
+                {% if page_obj %}
+                    {% for paper in page_obj %}
+                      <!-- 논문 카드: 좌(체크) - 우(본문) -->
+                      <div class="paper-card">
+                        <!-- 체크박스 -->
+                        <div class="check-col">
+                          <input type="checkbox"
+                                 class="form-check-input selected-paper"
+                                 name="selected_papers"
+                                 value="{{ paper.id }}"
+                                 data-paper-id="{{ paper.id }}">
+                        </div>
+
+                        <!-- 본문(제목/저자/키워드/파트/연도) -->
+                        <div class="body-col">
+                          <!-- 제목 -->
+                          <h5 class="paper-title">
+                            <a href="{% url 'paper_page' paper_id=paper.id %}">
+                              {{ paper.title }}
+                            </a>
+                          </h5>
+
+                          <!-- 저자 -->
+                          <div class="meta-line meta-authors">
+                            <span class="meta-label">저자:</span>
+                            {% for pa in paper.author_papers.all %}
+                              <a href="{% url 'author_page' author_id=pa.author_id.id %}" class="text-primary">
+                                {{ pa.author_id.name }}
+                              </a>{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                              <span class="text-muted">저자 없음</span>
+                            {% endfor %}
+                          </div>
+
+                          <!-- 키워드 -->
+                          <div class="meta-line meta-keywords">
+                            <span class="meta-label">키워드:</span>
+                            {% for pk in paper.keyword_papers.all %}
+                              <span class="tag">#{{ pk.keyword_id.keyword_name }}</span>
+                            {% empty %}
+                              <span class="text-muted">키워드 없음</span>
+                            {% endfor %}
+                          </div>
+
+                          <!-- 파트 | 연도 -->
+                          <div class="meta-line meta-partyear">
+                            <span class="meta-label">파트:</span>
+                            {% for pp in paper.part_papers.all %}
+                              {{ pp.part_id.name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                              <span class="text-muted">파트 없음</span>
+                            {% endfor %}
+                            <span class="sep">|</span>
+                            <span class="meta-label">연도:</span>
+                            <span>{{ paper.year|default:"연도 없음" }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+
+                    <!-- 페이지네이션 컨트롤(동적 렌더링) -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav aria-label="Page navigation">
+                            <div id="paginationControls" class="mt-4"></div>
+                        </nav>
+                    </div>
+                {% else %}
+                    <p class="text-start text-muted">등록된 논문이 없습니다.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 위쪽 내용(탭, 차트 영역, 논문 카드 등)은 그대로 두고, 아래에서 JS용 데이터만 전달 -->
+
+<!-- Django → JS 데이터 전달용 (스크립트 X, data-* 속성만 사용) -->
+<div id="country-config"
+     data-id="{{ country.id }}"
+     data-name="{{ country.name|escapejs }}"
+     data-content-type="{{ content_type|default:'country' }}"
+     data-object-id="{{ object_id|default:country.id }}"
+     data-page-title="{{ page_title|default:country.name|escapejs }}"
+     data-csrf-token="{{ csrf_token }}"
+     data-current-page="{{ page_obj.number|default:1 }}"
+     data-total-pages="{{ page_obj.paginator.num_pages|default:1 }}"
+     data-items-per-page="{{ items_per_page|default:10 }}"
+     data-is-authenticated="{{ user.is_authenticated|yesno:'true,false' }}">
+</div>
+
+<!-- html2canvas / jsPDF : PDF 캡처·생성 라이브러리 로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Chart.js, D3, d3-cloud : 차트 & 워드클라우드 렌더링 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+
+<!-- 분리된 JS 파일: 국가 상세 페이지 전용 스크립트 -->
+<script src="{% static 'js/country.js' %}"></script>
+
+{% endblock %}

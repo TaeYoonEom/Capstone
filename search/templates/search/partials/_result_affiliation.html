@@ -1,0 +1,72 @@
+{% if results %}
+    {% if filter_type == "affiliation" %}
+        {% for aff in results %}
+            <div class="mb-4 p-3 border shadow-sm rounded d-flex align-items-start"
+                data-author="{{ aff.authors|default:'정보 없음' }}"
+                data-part="{{ aff.main_part|default:'정보 없음' }}"
+                data-country="{{ aff.country|default:'정보 없음' }}">
+
+                <div class="flex-grow-1">
+                    <h5 class="mb-2 fw-bold" style="color: #000;">
+                        <a href="{% url 'affiliation_page' affiliation_id=aff.id %}" class="mb-2 fw-bold" style="color: black;">
+                            {{ aff.name }}
+                        </a>
+                    </h5>
+                    <!-- 키워드 -->
+                    <div class="mb-2" style="font-size:0.85rem; color:#000;">
+                        {% if aff.top_keywords %}
+                            {% for keyword in aff.top_keywords %}
+                                <a href="{% url 'keyword_page' keyword.id %}"
+                                class="badge bg-light me-1" style="color:#6900B8; text-decoration:none;">
+                                #{{ keyword.name }}
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- 저자 -->
+                    <div class="mb-2" style="font-size:0.85rem; color:#000;">
+                    <strong>저자 </strong>
+                    {% for a in aff.authors %}
+                        <a href="{% url 'author_page' a.id %}" class="text-decoration-none" style="color:#000;">
+                        {{ a.name }}
+                        </a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if aff.remaining_authors > 0 %}
+                        외 {{ aff.remaining_authors }}인
+                    {% endif %}
+                    </div>
+
+                    <!-- 파트 | 국가 | 논문수 | 인용수 -->
+                    <div class="mb-2" style="font-size: 0.85rem; color: #000;">
+                        <strong>파트 </strong> {{ aff.main_part|default:"정보 없음" }} |
+                        <strong>국가 </strong> 
+                        {% if aff.country_id %}
+                            <a href="{% url 'country_page' country_id=aff.country_id %}" class="text-decoration-none" style="color:#000;">
+                            {{ aff.country|default:"정보 없음" }}
+                            </a>
+                        {% else %}
+                            {{ aff.country|default:"정보 없음" }}
+                        {% endif %} |
+                        <strong>논문수 </strong> {{ aff.paper_count|default:0 }} |
+                        <strong>평균 인용수 </strong> {{ aff.avg_citations|floatformat:2|default:0 }}
+                    </div>
+                </div>
+                <!-- 하트 버튼 -->
+                <div class="d-flex flex-column align-items-center ms-auto align-self-center" data-like="container">
+                    <button class="btn like-btn"
+                        data-id="{{ aff.id }}"
+                        data-type="affiliation"
+                        data-like-url="{% url 'like_affiliation' item_id=aff.id %}"
+                        data-logged-in="{% if user_id %}true{% else %}false{% endif %}" 
+                        style="border: none; background: none;">
+                        <i class="fa-{% if aff.liked %}solid{% else %}regular{% endif %} fa-heart text-danger" style="font-size: 24px;"></i>
+                    </button>
+                    <span class="like-count" data-id="{{ aff.id }}" data-type="affiliation">{{ aff.like_count }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-danger">검색 결과가 없습니다.</p>
+    {% endif %}
+{% endif %}
