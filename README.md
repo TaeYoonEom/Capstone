@@ -148,7 +148,7 @@ python manage.py runserver
 
 ---
 
-## 📸 실행 화면 (추가 권장)
+## 📸 실행 화면(메인 화면)
 
 <img width="170" height="207" alt="image" src="https://github.com/user-attachments/assets/9fad1a68-95ae-4a54-a4d2-0a6e50930067" />
 
