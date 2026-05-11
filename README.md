@@ -12,6 +12,18 @@
 
 ---
 
+## 🛠 기술 스택
+
+| 구분       | 기술                          |
+| -------- | --------------------------- |
+| Backend  | Python, Django              |
+| Frontend | HTML, CSS, JavaScript, Ajax |
+| Database | MariaDB                     |
+| AI       | BERT, TF-IDF                |
+| Infra    | GitHub                      |
+
+---
+
 ## 🎯 주요 기능
 
 ### 🔍 통합 검색 시스템
@@ -40,18 +52,6 @@
 
 * Ajax 기반 부분 렌더링
 * 페이지 새로고침 없이 실시간 결과 반영
-
----
-
-## 🛠 기술 스택
-
-| 구분       | 기술                          |
-| -------- | --------------------------- |
-| Backend  | Python, Django              |
-| Frontend | HTML, CSS, JavaScript, Ajax |
-| Database | MariaDB                     |
-| AI       | BERT, TF-IDF                |
-| Infra    | GitHub                      |
 
 ---
 
