@@ -139,15 +139,6 @@ python manage.py runserver
 
 ---
 
-## 💡 핵심 구현 포인트
-
-* 🔥 BERT 기반 의미 검색 구현
-* 🔥 TF-IDF + 인용수 기반 키워드 추천
-* 🔥 Ajax 기반 비동기 검색 UI
-* 🔥 통합 검색 시스템 설계
-
----
-
 ## 📸 실행 화면(메인 화면)
 
 <img width="170" height="207" alt="image" src="https://github.com/user-attachments/assets/9fad1a68-95ae-4a54-a4d2-0a6e50930067" />
